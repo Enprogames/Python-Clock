@@ -36,15 +36,15 @@ class Block:
         end_dt = datetime(now.year, now.month, now.day, self.end.hour, self.end.minute, self.end.second, self.end.microsecond)
         return end_dt
 
-def Read_Schedule(day = "normal"):
-    with open('sched.csv', 'r') as file:
+def Read_Schedule(day = "n"):
+    with open('/home/9927486/Documents/Python Projects/Python-Clock-master/Clock/sched.csv', 'r') as file:
         #days of week
         #0 = monday, 1 = tuesday, 2 = wednesday, 3 = thursday, 4 = friday, 5 = saturday, 6 = sunday
         reader = csv.reader(file)
         count = 0 #iteration count for loop
         duration = 7
         #startTime = ''
-        if day == 'flex':
+        if day == 'f':
             duration = 11
             for i in range(9):
                 next(reader)
