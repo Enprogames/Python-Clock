@@ -10,6 +10,7 @@ nowTotalSeconds = 0
 current_block = ''
 time_till_next = 0
 block_delta = 0
+file_path = "E:\e_pos\Documents\School\Grade 12\Hackerspace\Python-Clock-master\Clock\sched.csv"
 
 class Block:
 
@@ -35,54 +36,7 @@ class Block:
     def get_end(self, now):
         end_dt = datetime(now.year, now.month, now.day, self.end.hour, self.end.minute, self.end.second, self.end.microsecond)
         return end_dt
-
-def Read_Schedule(day = "n"):
-    with open('/home/9927486/Documents/Python Projects/Python-Clock-master/Clock/sched.csv', 'r') as file:
-        #days of week
-        #0 = monday, 1 = tuesday, 2 = wednesday, 3 = thursday, 4 = friday, 5 = saturday, 6 = sunday
-        reader = csv.reader(file)
-        count = 0 #iteration count for loop
-        duration = 7
-        #startTime = ''
-        if day == 'f':
-            duration = 11
-            for i in range(9):
-                next(reader)
-
-        next(reader) #skips line
-        for line in reader:
-
-            startsstring.append(line[1])
-            endsstring.append(line[2])
-
-            listS = startsstring[count].split(':')
-            listE = endsstring[count].split(':')
-
-            for i in range(len(listS)):
-                listS[i] = int(listS[i])
-            num = time(listS[0], listS[1], listS[2])
-            starts.append(num)
-
-            for i in range(len(listE)):
-                listE[i] = int(listE[i])
-            num = time(listE[0], listE[1], listE[2])
-            ends.append(num)
-
-            #print(starts[count], ends[count], line[0])
-            if not line[0][0] == 'F':
-                blocks.append(Block(starts[count], ends[count], line[0]))
-            else:
-                blocks.append(Block(starts[count], ends[count], line[0]))
-
-            if count > duration:
-                break
-            count += 1
-        #blocks.append(Block(time(),time(),"Break"))
-
-        #for x in range(len(blocks)):
-        #    print(blocks[x].name, blocks[x].start, blocks[x].end)
-        #print(str(blocks))
-
+    
 def totalSeconds(x):
     hour = x.hour * 3600
     minutes = x.minute * 60
@@ -111,3 +65,65 @@ def pretty_time_delta(seconds):
         return '%s%dm%ds' % (sign_string, minutes, seconds)
     else:
         return '%s%ds' % (sign_string, seconds)
+
+def Read_Schedule(day = "n"):
+    num_lines = sum(1 for line in open(file_path))
+    custom_length = num_lines - 24 #length of the custom schedule
+    with open(file_path, 'r') as file:
+        #days of week
+        #0 = monday, 1 = tuesday, 2 = wednesday, 3 = thursday, 4 = friday, 5 = saturday, 6 = sunday
+        reader = csv.reader(file)
+        count = 0 #iteration count for loop
+
+        next(reader) #skips the instructional line in the csv file
+
+        if day == 'f':
+            duration = 11
+            for i in range(9):
+                next(reader)
+                
+        elif day == 'c':
+            duration = custom_length - 2 #length of the custom schedule minus the before and after school times
+            for i in range(23):
+                next(reader)
+            
+        else:
+            duration = 7 #how many blocks are in the day not including before and after school
+        
+
+        #Note to self: Redo everything after this point
+        for line in reader:
+
+            startsstring.append(line[1])
+            endsstring.append(line[2])
+
+            listS = startsstring[count].split(':')
+            listE = endsstring[count].split(':')
+
+            for i in range(len(listS)):
+                listS[i] = int(listS[i])
+            num = time(listS[0], listS[1], listS[2])
+            starts.append(num)
+
+            for i in range(len(listE)):
+                listE[i] = int(listE[i])
+            num = time(listE[0], listE[1], listE[2])
+            ends.append(num)
+
+            #print(starts[count], ends[count], line[0])
+            if not line[0][0] == 'F':
+                blocks.append(Block(starts[count], ends[count], line[0]))
+            else:
+                blocks.append(Block(starts[count], ends[count], line[0]))
+
+            if count > duration:
+                break
+            count += 1
+            
+        #blocks.append(Block(time(),time(),"Break"))
+
+        #for x in range(len(blocks)):
+        #    print(blocks[x].name, blocks[x].start, blocks[x].end)
+        #print(str(blocks))
+
+

@@ -22,7 +22,7 @@ def get_block(now):
     return blocks[-1]
 
 
-
+#note to self: redo this whole function
 def check_alert(now):
 
     #  weekdays
@@ -94,7 +94,11 @@ def tick(time1 = '', date1 = ''):
     day = datetime.now().weekday()
     if (schedule_override == None and day == 2) or schedule_override == 'f':
         Read_Schedule(day='f')
-    Read_Schedule()
+    elif schedule_override == 'c':
+        Read_Schedule(day='c')
+    else:
+        Read_Schedule()
+
     ############### Problem Zone ##################
 
     #now = datetime(now.year, now.month, now.day, 15, 56, 0, 0)
@@ -110,6 +114,8 @@ def tick(time1 = '', date1 = ''):
     #print(time_till_end)
     time_till_end = hours_minutes_seconds(time_till_end)
     summer = datetime(now.year, 7, 1, 0, 0, 0, 0)
+    if now > summer:
+        summer = datetime(now.year+1, 7, 1, 0, 0, 0, 0)
     days_till_summer = summer - now
     days_till_summer = pretty_time_delta(days_till_summer.total_seconds())
     time2 = now.strftime('%H:%M:%S')
@@ -132,7 +138,7 @@ def tick(time1 = '', date1 = ''):
     #shoes time till summer if school is not in session
     if is_school(block):
         w.time_till_summer.config(fg = 'grey25')
-        #time_till_summer.config(fg = 'white')
+        #w.time_till_summer.config(fg = 'white')
         w.time_till_summer.place(relx=.85, rely=0.8, anchor="n")
         w.remainingLabel.config(font = ('Helvetica', int(font_size/2), 'normal')) # default font/2
         w.remainingLabel.place(relx=.5, rely=.7, anchor="n")
