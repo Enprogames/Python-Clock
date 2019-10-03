@@ -1,11 +1,11 @@
 from datetime import time, date, datetime
 import csv
 
-blocks = []
+blocks = [] # an array of block objects
 startsstring = []
 endsstring   = []
-starts = []
-ends   = []
+starts = [] # an array of starting times for the blocks
+ends   = [] # an array of ending times for the blocks
 nowTotalSeconds = 0
 current_block = ''
 time_till_next = 0
@@ -97,6 +97,9 @@ def Read_Schedule(day = "n"):
             startsstring.append(line[1])
             endsstring.append(line[2])
 
+            # a horrible way to create a datetime object. these variables are used to split up the starting and ending
+            # times (which are in the form of strings) into lists ([hours, minutes, seconds]). At least 2 steps
+            # of this process could be cut out
             listS = startsstring[count].split(':')
             listE = endsstring[count].split(':')
 

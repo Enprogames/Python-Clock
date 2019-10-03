@@ -35,6 +35,10 @@ def check_alert(now):
     #sunday:    6
 
     day = now.weekday()
+
+    #after this point, the method manually changes the
+    #print(blocks)
+
     short_now = time(now.hour, now.minute, 0, 0) #just hour and minutes
     if (schedule_override == None and day >= 5) or schedule_override == 'w': #weekend
         pass
@@ -74,7 +78,7 @@ def check_alert(now):
         elif short_now == ends[7]:
             # print("School has Ended")
             w.alertLabel.config(text="School has Ended", fg="white")
-            background_color("red")
+            w.background_color("red")
         else:
             w.alertLabel.config(fg="grey25")
             w.background_color("grey25")
@@ -129,10 +133,10 @@ def tick(time1 = '', date1 = ''):
     w.currentLabel.config(text = "Block: {}".format(block))
     w.date.config(text=date2)
     if block.name == "Break 1" or block.name == "Lunch" or block.name == "Break 2":
-        w.remainingLabel.config(text="Time Till Block Start:\n {}".format(time_till_end))
+        w.remainingLabel.config(text="Time Until Block Start:\n {}".format(time_till_end))
         w.time_till_summer.config(text="Summer Starts In:\n{}".format(days_till_summer))
     else:
-        w.remainingLabel.config(text = "Time Till Block End:\n {}".format(time_till_end))
+        w.remainingLabel.config(text = "Time Until Block End:\n {}".format(time_till_end))
         w.time_till_summer.config(text ="Summer Starts In:\n{}".format(days_till_summer))
 
     #shoes time till summer if school is not in session
@@ -145,10 +149,12 @@ def tick(time1 = '', date1 = ''):
     else:
         w.time_till_summer.place(relx=.6, rely=.6, anchor="n")
         w.time_till_summer.config(fg = 'white')
-        w.remainingLabel.config(font = ('Helvetica', int(font_fize/4), 'normal')) # default font/4
+        w.remainingLabel.config(font = ('Helvetica', int(font_size/4), 'normal')) # default font/4
         w.remainingLabel.place(relx=.6, rely=.6, anchor="n")
 
-    #check to see if an alert should be given
+    # check to see if an alert should be given
+    # the screen is only red for one minute because it uses a shortened version of the current time (short_now),
+    # which only has takes the current hours and minutes into account
     check_alert(now)
 
     w.clock.after(500, tick) #calls tick every 1 millisecond
