@@ -114,7 +114,7 @@ def tick(time1 = '', date1 = ''):
 
     ############### Problem Zone ##################
 
-    now = datetime(now.year, now.month, now.day, 10, 30, 1, 0)
+    #now = datetime(now.year, now.month, now.day, 10, 30, 1, 0)
     block = get_block(now)
 
     block_start = block.get_start(now)
