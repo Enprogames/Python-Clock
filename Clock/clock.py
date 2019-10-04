@@ -25,64 +25,73 @@ def get_block(now):
 #note to self: redo this whole function
 def check_alert(now):
 
-    #  weekdays
-    #monday:    0
-    #tuesday:   1
-    #wednesday: 2
-    #thursday:  3
-    #friday:    4
-    #saturday:  5
-    #sunday:    6
-
     day = now.weekday()
 
-    #after this point, the method manually changes the
-    #print(blocks)
+    #after this point, the method manually changes the alert message based on being between certain times and what day it is one. It is bad and must be fixed.
+    block = get_block(now)
+    #short_now = time(now.hour, now.minute, 0, 0) #just hour and minutes
+    if now.strftime('%H:%M') == block.get_start(now).time().strftime('%H:%M'):
+        w.background_color("red")
 
-    short_now = time(now.hour, now.minute, 0, 0) #just hour and minutes
-    if (schedule_override == None and day >= 5) or schedule_override == 'w': #weekend
-        pass
-    elif (schedule_override == None and day == 2) or schedule_override == 'f': #flex day
-        if short_now == starts[1]:
-            # print("School in Session")
+        if block.get_type() == 'before_school':
+            w.alertLabel.config(text="It is Now Midnight", fg="white")
+        elif block.get_type() == 'first':
             w.alertLabel.config(text="School in Session", fg="white")
-            w.background_color("red")
-        elif short_now == starts[3] or short_now == starts[5] or short_now == starts[7] or short_now == starts[9] or short_now == starts[11]:
-            # print("Block Started")
+        elif block.get_type() == 'normal':
             w.alertLabel.config(text="Block Started", fg="white")
-            w.background_color("red")
-        elif short_now == ends[1] or short_now == ends[3] or short_now == ends[5] or short_now == ends[7] or short_now == ends[9]:
-            # print("Block has Ended")
+        elif block.get_type() == 'break':
             w.alertLabel.config(text="Block has Ended", fg="white")
-            w.background_color("red")
-        elif short_now == ends[11]:
-            # print("School has Ended")
+        elif block.get_label() == 'lunch':
+            w.alertLabel.config(text="Lunch Started", fg="white")
+        elif block.get_label() == 'after_school':
             w.alertLabel.config(text="School has Ended", fg="white")
-            w.background_color("red")
-        else:
-            w.alertLabel.config(fg = "grey25")
-            w.background_color("grey25")
-    elif (schedule_override == None and not day == 2 and not day >= 5) or schedule_override == 'n': #normal school day
-        if short_now == starts[1]:
-            # print("School in Session")
-            w.alertLabel.config(text="School in Session", fg="white")
-            w.background_color("red")
-        elif short_now == starts[3] or short_now == starts[5] or short_now == starts[7]:
-            # print("Block Started")
-            w.alertLabel.config(text="Block Started", fg="white")
-            w.background_color("red")
-        elif short_now == ends[1] or short_now == ends[3] or short_now == ends[5]:
-            # print("Block has Ended")
-            w.alertLabel.config(text="Block has Ended", fg="white")
-            w.background_color("red")
-        elif short_now == ends[7]:
-            # print("School has Ended")
-            w.alertLabel.config(text="School has Ended", fg="white")
-            w.background_color("red")
-        else:
-            w.alertLabel.config(fg="grey25")
-            w.background_color("grey25")
-            #background_color("red")
+
+    else:
+        w.alertLabel.config(fg="grey25")
+        w.background_color("grey25")
+    # if (schedule_override == None and day >= 5) or schedule_override == 'w': #weekend
+    #     pass
+    # elif (schedule_override == None and day == 2) or schedule_override == 'f': #flex day
+    #     if short_now == starts[1]: # first block started
+    #         # print("School in Session")
+    #         w.alertLabel.config(text="School in Session", fg="white")
+    #         w.background_color("red")
+    #     elif short_now == starts[3] or short_now == starts[5] or short_now == starts[7] or short_now == starts[9] or short_now == starts[11]: #normal block started
+    #         # print("Block Started")
+    #         w.alertLabel.config(text="Block Started", fg="white")
+    #         w.background_color("red")
+    #     elif short_now == ends[1] or short_now == ends[3] or short_now == ends[5] or short_now == ends[7] or short_now == ends[9]: #break started
+    #         # print("Block has Ended")
+    #         w.alertLabel.config(text="Block has Ended", fg="white")
+    #         w.background_color("red")
+    #     elif short_now == ends[11]: # home time has started
+    #         # print("School has Ended")
+    #         w.alertLabel.config(text="School has Ended", fg="white")
+    #         w.background_color("red")
+    #     else: # don't show alert
+    #         w.alertLabel.config(fg = "grey25")
+    #         w.background_color("grey25")
+    # elif (schedule_override == None and not day == 2 and not day >= 5) or schedule_override == 'n': #normal school day
+    #     if short_now == starts[1]:
+    #         # print("School in Session")
+    #         w.alertLabel.config(text="School in Session", fg="white")
+    #         w.background_color("red")
+    #     elif short_now == starts[3] or short_now == starts[5] or short_now == starts[7]:
+    #         # print("Block Started")
+    #         w.alertLabel.config(text="Block Started", fg="white")
+    #         w.background_color("red")
+    #     elif short_now == ends[1] or short_now == ends[3] or short_now == ends[5]:
+    #         # print("Block has Ended")
+    #         w.alertLabel.config(text="Block has Ended", fg="white")
+    #         w.background_color("red")
+    #     elif short_now == ends[7]:
+    #         # print("School has Ended")
+    #         w.alertLabel.config(text="School has Ended", fg="white")
+    #         w.background_color("red")
+    #     else:
+    #         w.alertLabel.config(fg="grey25")
+    #         w.background_color("grey25")
+    #         #background_color("red")
 
 def is_school(block):
     if block.name == "before" or block.name == "after":
@@ -105,7 +114,7 @@ def tick(time1 = '', date1 = ''):
 
     ############### Problem Zone ##################
 
-    #now = datetime(now.year, now.month, now.day, 15, 56, 0, 0)
+    now = datetime(now.year, now.month, now.day, 10, 30, 1, 0)
     block = get_block(now)
 
     block_start = block.get_start(now)
@@ -132,7 +141,7 @@ def tick(time1 = '', date1 = ''):
     w.clock.config(text=time2)
     w.currentLabel.config(text = "Block: {}".format(block))
     w.date.config(text=date2)
-    if block.name == "Break 1" or block.name == "Lunch" or block.name == "Break 2":
+    if block.get_type == 'break' or block.get_type == 'lunch':
         w.remainingLabel.config(text="Time Until Block Start:\n {}".format(time_till_end))
         w.time_till_summer.config(text="Summer Starts In:\n{}".format(days_till_summer))
     else:

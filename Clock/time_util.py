@@ -10,14 +10,15 @@ nowTotalSeconds = 0
 current_block = ''
 time_till_next = 0
 block_delta = 0
-file_path = "E:\e_pos\Documents\School\Grade 12\Hackerspace\Python-Clock-master\Clock\sched.csv"
+file_path = "sched.csv"
 
 class Block:
 
-    def __init__(self, start, end, name):
+    def __init__(self, start, end, name, block_type):
         self.start = start
         self.end = end
         self.name = name
+        self.block_type = block_type # types of blocks: before_school, first, normal, break, lunch, after_school
 
     def __str__(self):
         return self.name
@@ -36,6 +37,8 @@ class Block:
     def get_end(self, now):
         end_dt = datetime(now.year, now.month, now.day, self.end.hour, self.end.minute, self.end.second, self.end.microsecond)
         return end_dt
+    def get_type(self):
+        return self.block_type
     
 def totalSeconds(x):
     hour = x.hour * 3600
@@ -114,10 +117,21 @@ def Read_Schedule(day = "n"):
             ends.append(num)
 
             #print(starts[count], ends[count], line[0])
-            if not line[0][0] == 'F':
-                blocks.append(Block(starts[count], ends[count], line[0]))
+            #print(count, duration)
+            #print(line[0][0:5].lower())
+            if count == 1:                
+                blocks.append(Block(starts[count], ends[count], line[0], 'first'))
+            elif line[0][0:5].lower() == 'break':
+                blocks.append(Block(starts[count], ends[count], line[0], 'break'))
+            elif line[0][0:5].lower() == 'lunch':
+                blocks.append(Block(starts[count], ends[count], line[0], 'lunch'))
+            elif count == 0:
+                blocks.append(Block(starts[count], ends[count], line[0], 'before_school'))
+            elif count == duration + 1:
+                blocks.append(Block(starts[count], ends[count], line[0], 'after_school'))
+            
             else:
-                blocks.append(Block(starts[count], ends[count], line[0]))
+                blocks.append(Block(starts[count], ends[count], line[0], 'normal'))
 
             if count > duration:
                 break
