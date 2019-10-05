@@ -10,7 +10,7 @@ nowTotalSeconds = 0
 current_block = ''
 time_till_next = 0
 block_delta = 0
-file_path = "E:\e_pos\Documents\School\Grade 12\Hackerspace\Python-Clock-master\Clock\sched.csv"
+file_path = "sched.csv"
 
 class Block:
 
