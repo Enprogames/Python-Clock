@@ -154,7 +154,7 @@ def tick(time1 = '', date1 = ''):
         #w.time_till_summer.config(fg = 'white')
         w.time_till_summer.place(relx=.85, rely=0.8, anchor="n")
         w.remainingLabel.config(font = ('Helvetica', int(font_size/2), 'normal')) # default font/2
-        w.remainingLabel.place(relx=.5, rely=.7, anchor="n")
+        w.remainingLabel.place(relx=.5, rely=.75, anchor="n")
     else:
         w.time_till_summer.place(relx=.6, rely=.6, anchor="n")
         w.time_till_summer.config(fg = 'white')

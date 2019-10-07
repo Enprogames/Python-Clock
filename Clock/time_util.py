@@ -1,4 +1,4 @@
-from datetime import time, date, datetime
+from datetime import time, date, datetime, timedelta
 import csv
 
 blocks = [] # an array of block objects
@@ -95,48 +95,61 @@ def Read_Schedule(day = "n"):
         
 
         #Note to self: Redo everything after this point
-        for line in reader:
+        if len(blocks) - 1 < duration:
+            for line in reader:
 
-            startsstring.append(line[1])
-            endsstring.append(line[2])
+                startsstring.append(line[1])
+                endsstring.append(line[2])
 
-            # a horrible way to create a datetime object. these variables are used to split up the starting and ending
-            # times (which are in the form of strings) into lists ([hours, minutes, seconds]). At least 2 steps
-            # of this process could be cut out
-            listS = startsstring[count].split(':')
-            listE = endsstring[count].split(':')
+                # a horrible way to create a datetime object. these variables are used to split up the starting and ending
+                # times (which are in the form of strings) into lists ([hours, minutes, seconds]). At least 2 steps
+                # of this process could be cut out
+                listS = startsstring[count].split(':')
+                listE = endsstring[count].split(':')
 
-            for i in range(len(listS)):
-                listS[i] = int(listS[i])
-            num = time(listS[0], listS[1], listS[2])
-            starts.append(num)
+                for i in range(len(listS)):
+                    listS[i] = int(listS[i])
+                num = time(listS[0], listS[1], listS[2])
+                starts.append(num)
 
-            for i in range(len(listE)):
-                listE[i] = int(listE[i])
-            num = time(listE[0], listE[1], listE[2])
-            ends.append(num)
+                for i in range(len(listE)):
+                    listE[i] = int(listE[i])
+                num = time(listE[0], listE[1], listE[2])
+                ends.append(num)
 
-            #print(starts[count], ends[count], line[0])
-            #print(count, duration)
-            #print(line[0][0:5].lower())
-            if count == 1:                
-                blocks.append(Block(starts[count], ends[count], line[0], 'first'))
-            elif line[0][0:5].lower() == 'break':
-                blocks.append(Block(starts[count], ends[count], line[0], 'break'))
-            elif line[0][0:5].lower() == 'lunch':
-                blocks.append(Block(starts[count], ends[count], line[0], 'lunch'))
-            elif count == 0:
-                blocks.append(Block(starts[count], ends[count], line[0], 'before_school'))
-            elif count == duration + 1:
-                blocks.append(Block(starts[count], ends[count], line[0], 'after_school'))
-            
-            else:
-                blocks.append(Block(starts[count], ends[count], line[0], 'normal'))
+                #print(starts[count], ends[count], line[0])
+                #print(count, duration)
+                #print(line[0][0:5].lower())
+                if count == 1:                
+                    blocks.append(Block(starts[count], ends[count], line[0], 'first'))
+                elif line[0][0:5].lower() == 'break':
+                    blocks.append(Block(starts[count], ends[count], line[0], 'break'))
+                elif line[0][0:5].lower() == 'lunch':
+                    blocks.append(Block(starts[count], ends[count], line[0], 'lunch'))
+                elif count == 0:
+                    blocks.append(Block(starts[count], ends[count], line[0], 'before_school'))
+                elif count == duration + 1:
+                    minus5minutes = datetime.combine(date.today(), (ends[count])) - datetime.combine(date.today(), time(0,5,0))
+                    minus5minutes = (datetime.min+minus5minutes).time()
+                    blocks.append(Block(starts[count], minus5minutes, line[0], 'after_school'))
+                elif count == duration:
+                    #print(datetime.combine(date.today(), ends[count]))
+                    
+                    if day == 4: # if friday then end 5 minutes early
+                        minus5minutes = datetime.combine(date.today(), (ends[count])) - datetime.combine(date.today(), time(0,5,0))
+                        minus5minutes = (datetime.min+minus5minutes).time()
+                        blocks.append(Block(starts[count], minus5minutes, line[0], 'last'))
+                    else:
+                        blocks.append(Block(starts[count], ends[count], line[0], 'last'))
+                    
+                else:
+                    blocks.append(Block(starts[count], ends[count], line[0], 'normal'))
+                    
 
-            if count > duration:
-                break
-            count += 1
-            
+                if count > duration:
+                    break
+                count += 1
+                
         #blocks.append(Block(time(),time(),"Break"))
 
         #for x in range(len(blocks)):
