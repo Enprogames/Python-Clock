@@ -41,9 +41,9 @@ def check_alert(now):
             w.alertLabel.config(text="Block Started", fg="white")
         elif block.get_type() == 'break':
             w.alertLabel.config(text="Block has Ended", fg="white")
-        elif block.get_label() == 'lunch':
+        elif block.get_type() == 'lunch':
             w.alertLabel.config(text="Lunch Started", fg="white")
-        elif block.get_label() == 'after_school':
+        elif block.get_type() == 'after_school':
             w.alertLabel.config(text="School has Ended", fg="white")
 
     else:
@@ -114,7 +114,7 @@ def tick(time1 = '', date1 = ''):
 
     ############### Problem Zone ##################
 
-    #now = datetime(now.year, now.month, now.day, 10, 30, 1, 0)
+    #now = datetime(now.year, now.month, now.day, 11, 45, 1, 0)
     block = get_block(now)
 
     block_start = block.get_start(now)
@@ -152,9 +152,9 @@ def tick(time1 = '', date1 = ''):
     if is_school(block):
         w.time_till_summer.config(fg = 'grey25')
         #w.time_till_summer.config(fg = 'white')
-        w.time_till_summer.place(relx=.85, rely=0.8, anchor="n")
+        w.time_till_summer.place(relx=.85, rely=0.9, anchor="n")
         w.remainingLabel.config(font = ('Helvetica', int(font_size/2), 'normal')) # default font/2
-        w.remainingLabel.place(relx=.5, rely=.75, anchor="n")
+        w.remainingLabel.place(relx=.5, rely=.8, anchor="n")
     else:
         w.time_till_summer.place(relx=.6, rely=.6, anchor="n")
         w.time_till_summer.config(fg = 'white')
