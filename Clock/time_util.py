@@ -69,7 +69,7 @@ def pretty_time_delta(seconds):
     else:
         return '%s%ds' % (sign_string, seconds)
 
-def Read_Schedule(day = "n"):
+def Read_Schedule(now, day = "n"):
     num_lines = sum(1 for line in open(file_path))
     custom_length = num_lines - 24 #length of the custom schedule
     with open(file_path, 'r') as file:
@@ -129,16 +129,20 @@ def Read_Schedule(day = "n"):
                 elif count == 0:
                     blocks.append(Block(starts[count], ends[count], line[0], 'before_school'))
                 elif count == duration + 1:
-                    minus5minutes = datetime.combine(date.today(), (ends[count])) - datetime.combine(date.today(), time(0,5,0))
-                    minus5minutes = (datetime.min+minus5minutes).time()
-                    blocks.append(Block(starts[count], minus5minutes, line[0], 'after_school'))
+                    if now.weekday() == 4:
+                        minus5minutes = datetime.combine(date.today(), (starts[count])) - datetime.combine(date.today(), time(0,5,0))
+                        minus5minutes = (datetime.min+minus5minutes).time()
+                        blocks.append(Block(minus5minutes, ends[count], line[0], 'after_school'))
+                    else:
+                        blocks.append(Block(starts[count], ends[count], line[0], 'after_school'))
+
                 elif count == duration:
-                    #print(datetime.combine(date.today(), ends[count]))
-                    
-                    if day == 4: # if friday then end 5 minutes early
+
+                    if now.weekday() == 4: # if friday then end 5 minutes early
                         minus5minutes = datetime.combine(date.today(), (ends[count])) - datetime.combine(date.today(), time(0,5,0))
                         minus5minutes = (datetime.min+minus5minutes).time()
                         blocks.append(Block(starts[count], minus5minutes, line[0], 'last'))
+
                     else:
                         blocks.append(Block(starts[count], ends[count], line[0], 'last'))
                     

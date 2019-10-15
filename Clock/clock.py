@@ -102,19 +102,22 @@ def is_school(block):
 def tick(time1 = '', date1 = ''):
 
     now = datetime.now() #datetime object
+    now = datetime(now.year, now.month, 18, 15, 0, 1, 0)
+    #now = datetime(now.year, now.month, 18, 11, 45, 1, 0)
 
     ############### Problem Zone ##################
     day = datetime.now().weekday()
     if (schedule_override == None and day == 2) or schedule_override == 'f':
-        Read_Schedule(day='f')
+        Read_Schedule(now, day='f')
     elif schedule_override == 'c':
-        Read_Schedule(day='c')
+        Read_Schedule(now, day='c')
     else:
-        Read_Schedule()
+        Read_Schedule(now)
 
     ############### Problem Zone ##################
 
-    #now = datetime(now.year, now.month, now.day, 11, 45, 1, 0)
+    
+
     block = get_block(now)
 
     block_start = block.get_start(now)
@@ -135,7 +138,7 @@ def tick(time1 = '', date1 = ''):
     date2 = now.strftime('%A, %B %d, %Y')
 
     if (time2 == '08:55:00'):
-        Read_Schedule()
+        Read_Schedule(now)
 
     #configure the clock gui
     w.clock.config(text=time2)
@@ -152,7 +155,7 @@ def tick(time1 = '', date1 = ''):
     if is_school(block):
         w.time_till_summer.config(fg = 'grey25')
         #w.time_till_summer.config(fg = 'white')
-        w.time_till_summer.place(relx=.85, rely=0.9, anchor="n")
+        w.time_till_summer.place(relx=.9, rely=0.85, anchor="n")
         w.remainingLabel.config(font = ('Helvetica', int(font_size/2), 'normal')) # default font/2
         w.remainingLabel.place(relx=.5, rely=.8, anchor="n")
     else:
