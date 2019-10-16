@@ -102,7 +102,7 @@ def is_school(block):
 def tick(time1 = '', date1 = ''):
 
     now = datetime.now() #datetime object
-    now = datetime(now.year, now.month, 18, 15, 0, 1, 0)
+    #now = datetime(now.year, now.month, 18, 15, 0, 1, 0)
     #now = datetime(now.year, now.month, 18, 11, 45, 1, 0)
 
     ############### Problem Zone ##################
