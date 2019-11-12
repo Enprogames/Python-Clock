@@ -1,7 +1,7 @@
 import tkinter as tk
 
 font_size = 100
-font_type = "Helvetica"
+font_type = "Comic Sans MS" # normal = Helvetica
 
 def background_color(color):
     frame.config(bg=color)
@@ -18,7 +18,7 @@ frame.attributes("-fullscreen", True) #change to True for final program
 frame.configure(background = 'grey')
 
 #clock widget
-clock = tk.Label(frame, font = (font_type, int(font_size*2), 'normal'), #change font size to 200 for final program
+clock = tk.Label(frame, font = (font_type, int(font_size*2), 'bold italic'), #change font size to 200 for final program
                  bg = 'grey25', fg = 'white')
 clock.place(relx=.5, rely=.5, anchor="center")
 
