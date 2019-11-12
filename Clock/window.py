@@ -24,7 +24,7 @@ clock.place(relx=.5, rely=.5, anchor="center")
 
 #date widget
 date = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
-date.place(relx=.5, rely=.6, anchor="n")
+date.place(relx=.5, rely=.65, anchor="n")
 
 #alert for sutdents to change classes
 alertLabel = tk.Label(frame, text = 'Change Classes', font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'grey25')
