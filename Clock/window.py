@@ -18,7 +18,7 @@ frame.attributes("-fullscreen", True) #change to True for final program
 frame.configure(background = 'grey')
 
 #clock widget
-clock = tk.Label(frame, font = (font_type, int(font_size*2), 'bold italic'), #change font size to 200 for final program
+clock = tk.Label(frame, font = (font_type, int(font_size*1.5), 'bold italic'), #change font size to 200 for final program
                  bg = 'grey25', fg = 'white')
 clock.place(relx=.5, rely=.5, anchor="center")
 
@@ -31,8 +31,8 @@ alertLabel = tk.Label(frame, text = 'Change Classes', font = (font_type, int(fon
 alertLabel.grid(row=0, column = 1)
 
 #current block
-currentLabel = tk.Label(frame, text = "Block: ", font = (font_type, int(font_size), 'normal'), bg = 'grey25', fg = 'white')
-currentLabel.place(relx=.50, rely=.1, anchor="n")
+currentLabel = tk.Label(frame, text = "Block: ", font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
+currentLabel.place(relx=.50, rely=.05, anchor="n")
 
 #time remaining till next class (location is set in tick method)
 remainingLabel = tk.Label(frame, text = "time remaining: ", font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
