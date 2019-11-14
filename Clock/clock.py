@@ -3,6 +3,9 @@ import window as w
 import time
 from datetime import time, datetime
 import argparse
+# these must be installed on raspberry pi
+import requests
+from bs4 import BeautifulSoup as soup
 
 message = "never gonna give you up"
 
@@ -23,6 +26,19 @@ def get_block(now):
 
 
 #note to self: redo this whole function
+
+def get_fact(date):
+
+    r = requests.get('http://numbersapi.com/{}/date?write&fragment'.format(date))
+
+    html_contents = r.text
+    for i in range(len(html_contents)):
+        if html_contents[i] == '\"':
+            html_contents = html_contents[i+1:-3]
+            break
+    
+    return html_contents
+    
 def check_alert(now):
 
     day = now.weekday()
@@ -38,9 +54,9 @@ def check_alert(now):
         elif block.get_type() == 'first':
             w.alertLabel.config(text="School in Session", fg="white")
         elif block.get_type() == 'normal':
-            w.alertLabel.config(text="Block Started", fg="white")
+            w.alertLabel.config(text="Block Ended", fg="white")
         elif block.get_type() == 'break':
-            w.alertLabel.config(text="Block has Ended", fg="white")
+            w.alertLabel.config(text="Block has Started", fg="white")
         elif block.get_type() == 'lunch':
             w.alertLabel.config(text="Lunch Started", fg="white")
         elif block.get_type() == 'after_school':
@@ -49,49 +65,7 @@ def check_alert(now):
     else:
         w.alertLabel.config(fg="grey25")
         w.background_color("grey25")
-    # if (schedule_override == None and day >= 5) or schedule_override == 'w': #weekend
-    #     pass
-    # elif (schedule_override == None and day == 2) or schedule_override == 'f': #flex day
-    #     if short_now == starts[1]: # first block started
-    #         # print("School in Session")
-    #         w.alertLabel.config(text="School in Session", fg="white")
-    #         w.background_color("red")
-    #     elif short_now == starts[3] or short_now == starts[5] or short_now == starts[7] or short_now == starts[9] or short_now == starts[11]: #normal block started
-    #         # print("Block Started")
-    #         w.alertLabel.config(text="Block Started", fg="white")
-    #         w.background_color("red")
-    #     elif short_now == ends[1] or short_now == ends[3] or short_now == ends[5] or short_now == ends[7] or short_now == ends[9]: #break started
-    #         # print("Block has Ended")
-    #         w.alertLabel.config(text="Block has Ended", fg="white")
-    #         w.background_color("red")
-    #     elif short_now == ends[11]: # home time has started
-    #         # print("School has Ended")
-    #         w.alertLabel.config(text="School has Ended", fg="white")
-    #         w.background_color("red")
-    #     else: # don't show alert
-    #         w.alertLabel.config(fg = "grey25")
-    #         w.background_color("grey25")
-    # elif (schedule_override == None and not day == 2 and not day >= 5) or schedule_override == 'n': #normal school day
-    #     if short_now == starts[1]:
-    #         # print("School in Session")
-    #         w.alertLabel.config(text="School in Session", fg="white")
-    #         w.background_color("red")
-    #     elif short_now == starts[3] or short_now == starts[5] or short_now == starts[7]:
-    #         # print("Block Started")
-    #         w.alertLabel.config(text="Block Started", fg="white")
-    #         w.background_color("red")
-    #     elif short_now == ends[1] or short_now == ends[3] or short_now == ends[5]:
-    #         # print("Block has Ended")
-    #         w.alertLabel.config(text="Block has Ended", fg="white")
-    #         w.background_color("red")
-    #     elif short_now == ends[7]:
-    #         # print("School has Ended")
-    #         w.alertLabel.config(text="School has Ended", fg="white")
-    #         w.background_color("red")
-    #     else:
-    #         w.alertLabel.config(fg="grey25")
-    #         w.background_color("grey25")
-    #         #background_color("red")
+  
 
 def is_school(block):
     if block.name == "before" or block.name == "after":
@@ -170,6 +144,8 @@ def tick(time1 = '', date1 = ''):
     check_alert(now)
 
     w.clock.after(500, tick) #calls tick every 1 millisecond
+
+w.fact_label.config(text = get_fact(datetime.now().strftime('%m/%d')))
 
 tick()
 w.frame.mainloop()
