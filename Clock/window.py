@@ -28,7 +28,7 @@ date = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg = 'gre
 date.place(relx=.5, rely=.65, anchor="n")
 
 #fact of the day label
-fact_label = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white', wraplength=1500)
+fact_label = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white', wraplength=1300)
 fact_label.place(relx=.5, rely=.0, anchor="n")
 
 #alert for sutdents to change classes
@@ -37,7 +37,7 @@ alertLabel.grid(row=0, column = 1)
 
 #current block
 currentLabel = tk.Label(frame, text = "Block: ", font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
-currentLabel.place(relx=.2, rely=.8, anchor="n")
+currentLabel.place(relx=.13, rely=.8, anchor="n")
 
 #time remaining till next class (location is set in tick method)
 remainingLabel = tk.Label(frame, text = "time remaining: ", font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
