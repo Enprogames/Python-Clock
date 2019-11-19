@@ -8,7 +8,7 @@ def background_color(color):
     clock.config(bg=color)
     date.config(bg=color)
     alertLabel.config(bg=color)
-    currentLabel.config(bg=color)
+    #currentLabel.config(bg=color)
     remainingLabel.config(bg=color)
     time_till_summer.config(bg=color)
 
@@ -28,16 +28,16 @@ date = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg = 'gre
 date.place(relx=.5, rely=.65, anchor="n")
 
 #fact of the day label
-fact_label = tk.Label(frame, font = (font_type, int(font_size/4), 'normal'), bg = 'grey25', fg = 'white', wraplength=1300)
+fact_label = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white', wraplength=1300)
 fact_label.place(relx=.5, rely=.0, anchor="n")
 
 #alert for sutdents to change classes
-alertLabel = tk.Label(frame, text = 'Change Classes', font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'grey25')
+alertLabel = tk.Label(frame, text = 'Change Classes', font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
 alertLabel.grid(row=0, column = 1)
 
 #current block
-currentLabel = tk.Label(frame, text = "Block: ", font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
-currentLabel.place(relx=.13, rely=.9, anchor="n")
+#currentLabel = tk.Label(frame, text = "Block: ", font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
+#currentLabel.place(relx=.13, rely=.9, anchor="n")
 
 #time remaining till next class (location is set in tick method)
 remainingLabel = tk.Label(frame, text = "time remaining: ", font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')

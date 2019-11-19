@@ -77,7 +77,7 @@ def check_alert(now):
             w.alertLabel.config(text="School has Ended", fg="white")
 
     else:
-        w.alertLabel.config(fg="grey25")
+        w.alertLabel.config(text="Block: {}".format(get_block(now)))
         w.background_color("grey25")
   
 
@@ -130,7 +130,7 @@ def tick(time1 = '', date1 = ''):
 
     #configure the clock gui
     w.clock.config(text=time2)
-    w.currentLabel.config(text = "Block: {}".format(block))
+    #w.currentLabel.config(text = "Block: {}".format(block))
     w.date.config(text=date2)
     if block.get_type == 'break' or block.get_type == 'lunch':
         w.remainingLabel.config(text="Time Until Block Start:\n {}".format(time_till_end))
