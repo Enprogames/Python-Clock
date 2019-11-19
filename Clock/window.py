@@ -1,7 +1,7 @@
 import tkinter as tk
 
 font_size = 100
-font_type = "Comic Sans MS" # normal = Helvetica
+font_type = "Helvetica" # normal = Helvetica
 
 def background_color(color):
     frame.config(bg=color)
@@ -19,7 +19,7 @@ frame.attributes("-fullscreen", True) #change to True for final program
 frame.configure(background = 'grey')
 
 #clock widget
-clock = tk.Label(frame, font = (font_type, int(font_size*1.5), 'bold italic'), #change font size to 200 for final program
+clock = tk.Label(frame, font = (font_type, int(font_size*1.5), 'bold'), #change font size to 200 for final program
                  bg = 'grey25', fg = 'white')
 clock.place(relx=.5, rely=.5, anchor="center")
 
@@ -32,7 +32,7 @@ fact_label = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg 
 fact_label.place(relx=.5, rely=.0, anchor="n")
 
 #alert for sutdents to change classes
-alertLabel = tk.Label(frame, text = 'Change Classes', font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
+alertLabel = tk.Label(frame, text = 'Change Classes', font = (font_type, int(font_size/2), 'bold'), bg = 'grey25', fg = 'white')
 alertLabel.grid(row=0, column = 1)
 
 #current block
