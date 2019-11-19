@@ -1,3 +1,4 @@
+import tkinter as tk
 from time_util import *
 import window as w
 import time
@@ -38,6 +39,19 @@ def get_fact(date):
             break
     
     return html_contents
+
+
+def get_joke():
+
+    r = requests.get('https://icanhazdadjoke.com/')
+
+    html_contents = r.text
+    page_soup = soup(html_contents, 'html.parser')
+
+    joke = page_soup.findAll('p', {'class': 'subtitle'})
+    
+    return joke[0].text
+
     
 def check_alert(now):
 
@@ -145,7 +159,7 @@ def tick(time1 = '', date1 = ''):
 
     w.clock.after(500, tick) #calls tick every 1 millisecond
 
-w.fact_label.config(text = get_fact(datetime.now().strftime('%m/%d')))
+w.fact_label.config(text = get_joke())
 
 tick()
 w.frame.mainloop()
