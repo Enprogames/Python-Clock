@@ -1,5 +1,6 @@
 from datetime import time, date, datetime, timedelta
 import csv
+#import platform
 
 blocks = [] # an array of block objects
 startsstring = []
@@ -10,7 +11,11 @@ nowTotalSeconds = 0
 current_block = ''
 time_till_next = 0
 block_delta = 0
-file_path = "sched.csv"
+file_path = "/home/pi/Python-Clock/Clock/sched.csv"
+# try:
+#     dist_name = platform.dist()[0]
+# except:
+#     pass
 
 class Block:
 
@@ -70,6 +75,7 @@ def pretty_time_delta(seconds):
         return '%s%ds' % (sign_string, seconds)
 
 def Read_Schedule(now, day = "n"):
+    #print(dist_name)
     num_lines = sum(1 for line in open(file_path))
     custom_length = num_lines - 24 #length of the custom schedule
     with open(file_path, 'r') as file:
