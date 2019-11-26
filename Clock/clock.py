@@ -1,12 +1,13 @@
 import tkinter as tk
 from time_util import *
 import window as w
-import time
+import time as t
 from datetime import time, datetime
 import argparse
 # these must be installed on raspberry pi
 import requests
 from bs4 import BeautifulSoup as soup
+from threading import Thread, Timer, Event
 
 message = "never gonna give you up"
 
@@ -18,6 +19,26 @@ args = parser.parse_args()
 font_size = parser.parse_args().font
 
 schedule_override = parser.parse_args().schedule
+
+got_joke = False
+
+class perpetualTimer():
+
+   def __init__(self,hFunction, t):
+      self.t=t
+      self.hFunction = hFunction
+      self.thread = Timer(self.t,self.handle_function)
+
+   def handle_function(self):
+      self.hFunction()
+      self.thread = Timer(self.t,self.handle_function)
+      self.thread.start()
+
+   def start(self):
+      self.thread.start()
+
+   def cancel(self):
+      self.thread.cancel()
 
 def get_block(now):
     for x in range(len(blocks)-1):
@@ -49,8 +70,18 @@ def get_joke():
     page_soup = soup(html_contents, 'html.parser')
 
     joke = page_soup.findAll('p', {'class': 'subtitle'})
+
+    
     
     return joke[0].text
+
+def sched_set_joke():
+    got_joke = False
+    joke = get_joke()
+    try:
+        w.fact_label.config(text = joke)
+    except:
+        w.fact_label.config(text = "Error Getting Joke")
 
     
 def check_alert(now):
@@ -156,10 +187,15 @@ def tick(time1 = '', date1 = ''):
     # the screen is only red for one minute because it uses a shortened version of the current time (short_now),
     # which only has takes the current hours and minutes into account
     check_alert(now)
-
     w.clock.after(500, tick) #calls tick every 1 millisecond
 
-w.fact_label.config(text = get_joke())
+try:
+    w.fact_label.config(text = joke)
+except:
+    w.fact_label.config(text = "Error Getting Joke")
+
+s = perpetualTimer(sched_set_joke, 679.8)
+s.start()
 
 tick()
 w.frame.mainloop()
