@@ -75,8 +75,9 @@ def get_joke():
     
     return joke[0].text
 
+
 def sched_set_joke():
-    got_joke = False
+
     joke = get_joke()
     try:
         w.fact_label.config(text = joke)
@@ -190,11 +191,12 @@ def tick(time1 = '', date1 = ''):
     w.clock.after(500, tick) #calls tick every 1 millisecond
 
 try:
-    w.fact_label.config(text = joke)
-except:
-    w.fact_label.config(text = "Error Getting Joke")
+    w.fact_label.config(text = get_joke())
+except Exception as e:
+    w.fact_label.config(text = e)
 
-s = perpetualTimer(sched_set_joke, 679.8)
+# s = perpetualTimer(sched_set_joke, 679.8)
+s = perpetualTimer(sched_set_joke, 600)
 s.start()
 
 tick()
