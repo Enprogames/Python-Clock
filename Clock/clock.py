@@ -64,7 +64,7 @@ def get_fact(date):
 
 def get_joke():
 
-    r = requests.get('https://icanhazdadjoke.com/')
+    r = requests.get('https://icanhazdadjoke.com/', verify=False)
 
     html_contents = r.text
     page_soup = soup(html_contents, 'html.parser')
