@@ -1,16 +1,17 @@
 import tkinter as tk
 
 font_size = 100
-font_type = "Helvetica"
+font_type = "Helvetica" # normal = Helvetica
 
 def background_color(color):
     frame.config(bg=color)
     clock.config(bg=color)
     date.config(bg=color)
     alertLabel.config(bg=color)
-    currentLabel.config(bg=color)
+    #currentLabel.config(bg=color)
     remainingLabel.config(bg=color)
     time_till_summer.config(bg=color)
+
 
 frame = tk.Tk()
 frame.title('Digital Clock')
@@ -18,21 +19,25 @@ frame.attributes("-fullscreen", True) #change to True for final program
 frame.configure(background = 'grey')
 
 #clock widget
-clock = tk.Label(frame, font = (font_type, int(font_size*2), 'normal'), #change font size to 200 for final program
+clock = tk.Label(frame, font = (font_type, int(font_size*1.5), 'bold'), #change font size to 200 for final program
                  bg = 'grey25', fg = 'white')
 clock.place(relx=.5, rely=.5, anchor="center")
 
 #date widget
 date = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
-date.place(relx=.5, rely=.7, anchor="n")
+date.place(relx=.5, rely=.65, anchor="n")
+
+#fact of the day label
+fact_label = tk.Label(frame, font = (font_type, int(font_size/8), 'normal'), bg = 'grey25', fg = 'white', wraplength=1300)
+fact_label.place(relx=.5, rely=.0, anchor="n")
 
 #alert for sutdents to change classes
-alertLabel = tk.Label(frame, text = 'Change Classes', font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'grey25')
+alertLabel = tk.Label(frame, text = 'Change Classes', font = (font_type, int(font_size/2), 'bold'), bg = 'grey25', fg = 'white')
 alertLabel.grid(row=0, column = 1)
 
 #current block
-currentLabel = tk.Label(frame, text = "Block: ", font = (font_type, int(font_size), 'normal'), bg = 'grey25', fg = 'white')
-currentLabel.place(relx=.50, rely=.1, anchor="n")
+#currentLabel = tk.Label(frame, text = "Block: ", font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
+#currentLabel.place(relx=.13, rely=.9, anchor="n")
 
 #time remaining till next class (location is set in tick method)
 remainingLabel = tk.Label(frame, text = "time remaining: ", font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white')
