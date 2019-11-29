@@ -28,7 +28,7 @@ date = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg = 'gre
 date.place(relx=.5, rely=.65, anchor="n")
 
 #fact of the day label
-fact_label = tk.Label(frame, font = (font_type, int(font_size/2), 'normal'), bg = 'grey25', fg = 'white', wraplength=1300)
+fact_label = tk.Label(frame, font = (font_type, int(font_size/8), 'normal'), bg = 'grey25', fg = 'white', wraplength=1300)
 fact_label.place(relx=.5, rely=.0, anchor="n")
 
 #alert for sutdents to change classes
