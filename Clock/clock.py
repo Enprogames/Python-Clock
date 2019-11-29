@@ -63,17 +63,19 @@ def get_fact(date):
 
 
 def get_joke():
+    try:
+        r = requests.get('https://icanhazdadjoke.com/')
 
-    r = requests.get('https://icanhazdadjoke.com/')
+        html_contents = r.text
+        page_soup = soup(html_contents, 'html.parser')
 
-    html_contents = r.text
-    page_soup = soup(html_contents, 'html.parser')
-
-    joke = page_soup.findAll('p', {'class': 'subtitle'})
+        joke = page_soup.findAll('p', {'class': 'subtitle'})
 
     
     
-    return joke[0].text
+        return joke[0].text
+    except:
+        pass
 
 
 def set_joke():
