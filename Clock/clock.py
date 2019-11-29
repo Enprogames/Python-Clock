@@ -1,8 +1,13 @@
+#import tkinter as tk
 from time_util import *
 import window as w
-import time
+#import time as t
 from datetime import time, datetime
 import argparse
+# these must be installed on raspberry pi
+import requests
+from bs4 import BeautifulSoup as soup
+from threading import Thread, Timer, Event
 
 message = "never gonna give you up"
 
@@ -15,6 +20,26 @@ font_size = parser.parse_args().font
 
 schedule_override = parser.parse_args().schedule
 
+got_joke = False
+
+class perpetualTimer():
+
+   def __init__(self,hFunction, t):
+      self.t=t
+      self.hFunction = hFunction
+      self.thread = Timer(self.t,self.handle_function)
+
+   def handle_function(self):
+      self.hFunction()
+      self.thread = Timer(self.t,self.handle_function)
+      self.thread.start()
+
+   def start(self):
+      self.thread.start()
+
+   def cancel(self):
+      self.thread.cancel()
+
 def get_block(now):
     for x in range(len(blocks)-1):
         if blocks[x].is_current_block(now):
@@ -23,62 +48,70 @@ def get_block(now):
 
 
 #note to self: redo this whole function
+
+def get_fact(date):
+
+    r = requests.get('http://numbersapi.com/{}/date?write&fragment'.format(date))
+
+    html_contents = r.text
+    for i in range(len(html_contents)):
+        if html_contents[i] == '\"':
+            html_contents = html_contents[i+1:-3]
+            break
+    
+    return html_contents
+
+
+def get_joke():
+
+    r = requests.get('https://icanhazdadjoke.com/')
+
+    html_contents = r.text
+    page_soup = soup(html_contents, 'html.parser')
+
+    joke = page_soup.findAll('p', {'class': 'subtitle'})
+
+    
+    
+    return joke[0].text
+
+
+def sched_set_joke():
+
+    joke = get_joke()
+    try:
+        w.fact_label.config(text = joke)
+    except:
+        w.fact_label.config(text = "Error Getting Joke")
+
+    
 def check_alert(now):
 
-    #  weekdays
-    #monday:    0
-    #tuesday:   1
-    #wednesday: 2
-    #thursday:  3
-    #friday:    4
-    #saturday:  5
-    #sunday:    6
-
     day = now.weekday()
-    short_now = time(now.hour, now.minute, 0, 0) #just hour and minutes
-    if (schedule_override == None and day >= 5) or schedule_override == 'w': #weekend
-        pass
-    elif (schedule_override == None and day == 2) or schedule_override == 'f': #flex day
-        if short_now == starts[1]:
-            # print("School in Session")
+
+    #after this point, the method manually changes the alert message based on being between certain times and what day it is one. It is bad and must be fixed.
+    block = get_block(now)
+    #short_now = time(now.hour, now.minute, 0, 0) #just hour and minutes
+    if now.strftime('%H:%M') == block.get_start(now).time().strftime('%H:%M'):
+        w.background_color("red")
+
+        if block.get_type() == 'before_school':
+            w.alertLabel.config(text="It is Now Midnight", fg="white")
+        elif block.get_type() == 'first':
             w.alertLabel.config(text="School in Session", fg="white")
-            w.background_color("red")
-        elif short_now == starts[3] or short_now == starts[5] or short_now == starts[7] or short_now == starts[9] or short_now == starts[11]:
-            # print("Block Started")
-            w.alertLabel.config(text="Block Started", fg="white")
-            w.background_color("red")
-        elif short_now == ends[1] or short_now == ends[3] or short_now == ends[5] or short_now == ends[7] or short_now == ends[9]:
-            # print("Block has Ended")
-            w.alertLabel.config(text="Block has Ended", fg="white")
-            w.background_color("red")
-        elif short_now == ends[11]:
-            # print("School has Ended")
+        elif block.get_type() == 'normal':
+            w.alertLabel.config(text="Block Ended", fg="white")
+        elif block.get_type() == 'break':
+            w.alertLabel.config(text="Block has Started", fg="white")
+        elif block.get_type() == 'lunch':
+            w.alertLabel.config(text="Lunch Started", fg="white")
+        elif block.get_type() == 'after_school':
             w.alertLabel.config(text="School has Ended", fg="white")
-            w.background_color("red")
-        else:
-            w.alertLabel.config(fg = "grey25")
-            w.background_color("grey25")
-    elif (schedule_override == None and not day == 2 and not day >= 5) or schedule_override == 'n': #normal school day
-        if short_now == starts[1]:
-            # print("School in Session")
-            w.alertLabel.config(text="School in Session", fg="white")
-            w.background_color("red")
-        elif short_now == starts[3] or short_now == starts[5] or short_now == starts[7]:
-            # print("Block Started")
-            w.alertLabel.config(text="Block Started", fg="white")
-            w.background_color("red")
-        elif short_now == ends[1] or short_now == ends[3] or short_now == ends[5]:
-            # print("Block has Ended")
-            w.alertLabel.config(text="Block has Ended", fg="white")
-            w.background_color("red")
-        elif short_now == ends[7]:
-            # print("School has Ended")
-            w.alertLabel.config(text="School has Ended", fg="white")
-            background_color("red")
-        else:
-            w.alertLabel.config(fg="grey25")
-            w.background_color("grey25")
-            #background_color("red")
+
+    else:
+        w.alertLabel.config(text="Block: {}".format(get_block(now)))
+        w.background_color("grey25")
+  
 
 def is_school(block):
     if block.name == "before" or block.name == "after":
@@ -89,19 +122,22 @@ def is_school(block):
 def tick(time1 = '', date1 = ''):
 
     now = datetime.now() #datetime object
+    #now = datetime(now.year, now.month, 18, 15, 0, 1, 0)
+    #now = datetime(now.year, now.month, 18, 11, 45, 1, 0)
 
     ############### Problem Zone ##################
     day = datetime.now().weekday()
     if (schedule_override == None and day == 2) or schedule_override == 'f':
-        Read_Schedule(day='f')
+        Read_Schedule(now, day='f')
     elif schedule_override == 'c':
-        Read_Schedule(day='c')
+        Read_Schedule(now, day='c')
     else:
-        Read_Schedule()
+        Read_Schedule(now)
 
     ############### Problem Zone ##################
 
-    #now = datetime(now.year, now.month, now.day, 15, 56, 0, 0)
+    
+
     block = get_block(now)
 
     block_start = block.get_start(now)
@@ -122,36 +158,46 @@ def tick(time1 = '', date1 = ''):
     date2 = now.strftime('%A, %B %d, %Y')
 
     if (time2 == '08:55:00'):
-        Read_Schedule()
+        Read_Schedule(now)
 
     #configure the clock gui
     w.clock.config(text=time2)
-    w.currentLabel.config(text = "Block: {}".format(block))
+    #w.currentLabel.config(text = "Block: {}".format(block))
     w.date.config(text=date2)
-    if block.name == "Break 1" or block.name == "Lunch" or block.name == "Break 2":
-        w.remainingLabel.config(text="Time Till Block Start:\n {}".format(time_till_end))
+    if block.get_type == 'break' or block.get_type == 'lunch':
+        w.remainingLabel.config(text="Time Until Block Start:\n {}".format(time_till_end))
         w.time_till_summer.config(text="Summer Starts In:\n{}".format(days_till_summer))
     else:
-        w.remainingLabel.config(text = "Time Till Block End:\n {}".format(time_till_end))
+        w.remainingLabel.config(text = "Time Until Block End:\n {}".format(time_till_end))
         w.time_till_summer.config(text ="Summer Starts In:\n{}".format(days_till_summer))
 
     #shoes time till summer if school is not in session
     if is_school(block):
         w.time_till_summer.config(fg = 'grey25')
         #w.time_till_summer.config(fg = 'white')
-        w.time_till_summer.place(relx=.85, rely=0.8, anchor="n")
+        w.time_till_summer.place(relx=.9, rely=0.85, anchor="n")
         w.remainingLabel.config(font = ('Helvetica', int(font_size/2), 'normal')) # default font/2
-        w.remainingLabel.place(relx=.5, rely=.7, anchor="n")
+        w.remainingLabel.place(relx=.5, rely=.8, anchor="n")
     else:
         w.time_till_summer.place(relx=.6, rely=.6, anchor="n")
         w.time_till_summer.config(fg = 'white')
-        w.remainingLabel.config(font = ('Helvetica', int(font_fize/4), 'normal')) # default font/4
+        w.remainingLabel.config(font = ('Helvetica', int(font_size/4), 'normal')) # default font/4
         w.remainingLabel.place(relx=.6, rely=.6, anchor="n")
 
-    #check to see if an alert should be given
+    # check to see if an alert should be given
+    # the screen is only red for one minute because it uses a shortened version of the current time (short_now),
+    # which only has takes the current hours and minutes into account
     check_alert(now)
-
     w.clock.after(500, tick) #calls tick every 1 millisecond
+
+try:
+    w.fact_label.config(text = get_joke())
+except Exception as e:
+    w.fact_label.config(text = e)
+
+# s = perpetualTimer(sched_set_joke, 679.8)
+#s = perpetualTimer(sched_set_joke, 600)
+#s.start()
 
 tick()
 w.frame.mainloop()
