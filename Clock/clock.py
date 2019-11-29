@@ -76,7 +76,7 @@ def get_joke():
     return joke[0].text
 
 
-def sched_set_joke():
+def set_joke():
 
     joke = get_joke()
     try:
@@ -199,7 +199,7 @@ def tick(time1 = '', date1 = ''):
 
 # s = perpetualTimer(sched_set_joke, 679.8)
 try:
-    s = perpetualTimer(get_joke, 0.5)
+    s = perpetualTimer(set_joke, 0.5)
     s.start()
 except Exception as e:
     w.fact_label.config(text=e)
