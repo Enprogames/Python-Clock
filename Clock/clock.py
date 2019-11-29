@@ -192,15 +192,15 @@ def tick(time1 = '', date1 = ''):
 
 
 
-try:
-    w.fact_label.config(text = get_joke())
-except Exception as e:
-    w.fact_label.config(text = e)
+# try:
+#     w.fact_label.config(text = get_joke())
+# except Exception as e:
+#     w.fact_label.config(text = e)
 
 w.fact_label.config(text = "adlfkjasldkjf")
 
 # s = perpetualTimer(sched_set_joke, 679.8)
-s = perpetualTimer(sched_set_joke, 600)
+s = perpetualTimer(sched_set_joke, 0.5)
 s.start()
 
 tick()
