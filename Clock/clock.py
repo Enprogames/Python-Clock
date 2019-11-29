@@ -1,7 +1,7 @@
-import tkinter as tk
+#import tkinter as tk
 from time_util import *
 import window as w
-import time as t
+#import time as t
 from datetime import time, datetime
 import argparse
 # these must be installed on raspberry pi
@@ -64,7 +64,7 @@ def get_fact(date):
 
 def get_joke():
 
-    r = requests.get('https://icanhazdadjoke.com/', verify=False)
+    r = requests.get('https://icanhazdadjoke.com/')
 
     html_contents = r.text
     page_soup = soup(html_contents, 'html.parser')
@@ -196,8 +196,8 @@ except Exception as e:
     w.fact_label.config(text = e)
 
 # s = perpetualTimer(sched_set_joke, 679.8)
-s = perpetualTimer(sched_set_joke, 600)
-s.start()
+#s = perpetualTimer(sched_set_joke, 600)
+#s.start()
 
 tick()
 w.frame.mainloop()
