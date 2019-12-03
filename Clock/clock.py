@@ -8,6 +8,7 @@ import argparse
 import requests
 from bs4 import BeautifulSoup as soup
 from threading import Thread, Timer, Event
+import random
 
 message = "never gonna give you up"
 
@@ -80,7 +81,7 @@ def set_joke():
         #joke = get_joke()
         #w.fact_label.config(text = joke)
 
-        w.fact_label.config(text='123')
+        w.fact_label.config(text=random.randint(0,10))
 
     except:
 
@@ -194,7 +195,7 @@ def tick(time1 = '', date1 = ''):
 
 
 
-set_joke()
+#set_joke()
 
 # s = perpetualTimer(sched_set_joke, 679.8)
 s = perpetualTimer(set_joke, 0.5)
