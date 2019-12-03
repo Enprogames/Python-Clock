@@ -63,27 +63,27 @@ def get_fact(date):
 
 
 def get_joke():
-    try:
-        r = requests.get('https://icanhazdadjoke.com/')
 
-        html_contents = r.text
-        page_soup = soup(html_contents, 'html.parser')
+    r = requests.get('https://icanhazdadjoke.com/')
 
-        joke = page_soup.findAll('p', {'class': 'subtitle'})
+    html_contents = r.text
+    page_soup = soup(html_contents, 'html.parser')
 
-    
-    
-        return joke[0].text
-    except:
-        pass
+    joke = page_soup.findAll('p', {'class': 'subtitle'})
+
+    return joke[0].text
 
 
 def set_joke():
-
-    joke = get_joke()
     try:
-        w.fact_label.config(text = joke)
+
+        #joke = get_joke()
+        #w.fact_label.config(text = joke)
+
+        w.fact_label.config(text='123')
+
     except:
+
         w.fact_label.config(text = "Error Getting Joke")
 
     
@@ -194,17 +194,10 @@ def tick(time1 = '', date1 = ''):
 
 
 
-# try:
-#     w.fact_label.config(text = get_joke())
-# except Exception as e:
-#     w.fact_label.config(text = e)
+set_joke()
 
 # s = perpetualTimer(sched_set_joke, 679.8)
-try:
-    s = perpetualTimer(set_joke, 0.5)
-    s.start()
-except Exception as e:
-    w.fact_label.config(text=e)
-
+s = perpetualTimer(set_joke, 0.5)
+s.start()
 tick()
 w.frame.mainloop()
