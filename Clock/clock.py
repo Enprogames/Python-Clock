@@ -6,9 +6,10 @@ from datetime import time, datetime
 import argparse
 # these must be installed on raspberry pi
 import requests
-from bs4 import BeautifulSoup as soup
+#from bs4 import BeautifulSoup as soup
 from threading import Thread, Timer, Event
 import random
+#import urllib.request
 
 message = "never gonna give you up"
 
@@ -50,30 +51,10 @@ def get_block(now):
 
 #note to self: redo this whole function
 
-def get_fact(date):
-
-    r = requests.get('http://numbersapi.com/{}/date?write&fragment'.format(date))
-
-    html_contents = r.text
-    for i in range(len(html_contents)):
-        if html_contents[i] == '\"':
-            html_contents = html_contents[i+1:-3]
-            break
-    
-    return html_contents
-
-
 def get_joke():
 
-    r = requests.get('https://icanhazdadjoke.com/')
-
-    html_contents = r.text
-    page_soup = soup(html_contents, 'html.parser')
-
-    joke = page_soup.findAll('p', {'class': 'subtitle'})
-
-    return joke[0].text
-
+    headers = {'Accept': 'application/json'}
+    return requests.get('https://icanhazdadjoke.com/', headers=headers).json().get('joke')
 
 def set_joke():
     try:
@@ -81,9 +62,10 @@ def set_joke():
         joke = get_joke()
         w.fact_label.config(text = joke)
 
-    except:
+    except Exception as e:
         try:
-            w.fact_label.config(text = "Error Getting Joke{}".format(random.randint(0,9)))
+            #w.fact_label.config(text = "Error Getting Joke{}".format(random.randint(0,9)))
+            w.fact_label.config(text=e)
         except:
             print("keyboard interrupt")
             quit(0)
