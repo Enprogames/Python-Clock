@@ -67,7 +67,10 @@ def set_joke():
     except Exception:
         try:
             #w.fact_label.config(text = "Error Getting Joke{}".format(random.randint(0,9)))
-            w.fact_label.config(text=traceback.format_exc())
+            error = traceback.format_exc()
+            f = open("error_file.txt", "w+")
+            f.write(error)
+            w.fact_label.config(text="error recorded")
         except:
             print("keyboard interrupt")
             quit(0)
