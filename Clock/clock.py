@@ -77,7 +77,7 @@ def get_joke():
 
 def set_joke():
     try:
-        
+
         joke = get_joke()
         w.fact_label.config(text = joke)
 
@@ -195,7 +195,7 @@ def tick(time1 = '', date1 = ''):
 set_joke()
 
 # s = perpetualTimer(sched_set_joke, 679.8)
-s = perpetualTimer(set_joke, 0.5)
+s = perpetualTimer(set_joke, 60)
 s.start()
 tick()
 w.frame.mainloop()
