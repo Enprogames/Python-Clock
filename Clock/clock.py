@@ -11,6 +11,7 @@ from threading import Thread, Timer, Event
 #import random
 #import urllib.request
 import sys
+import traceback
 
 message = "never gonna give you up"
 
@@ -66,7 +67,7 @@ def set_joke():
     except Exception:
         try:
             #w.fact_label.config(text = "Error Getting Joke{}".format(random.randint(0,9)))
-            w.fact_label.config(text=sys.exc_info()[2])
+            w.fact_label.config(text=traceback.format_exc())
         except:
             print("keyboard interrupt")
             quit(0)
