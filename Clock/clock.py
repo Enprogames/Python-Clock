@@ -8,8 +8,9 @@ import argparse
 import requests
 #from bs4 import BeautifulSoup as soup
 from threading import Thread, Timer, Event
-import random
+#import random
 #import urllib.request
+import sys
 
 message = "never gonna give you up"
 
@@ -62,10 +63,10 @@ def set_joke():
         joke = get_joke()
         w.fact_label.config(text = joke)
 
-    except Exception as e:
+    except Exception:
         try:
             #w.fact_label.config(text = "Error Getting Joke{}".format(random.randint(0,9)))
-            w.fact_label.config(text=e)
+            w.fact_label.config(text=sys.exc_info()[2])
         except:
             print("keyboard interrupt")
             quit(0)
