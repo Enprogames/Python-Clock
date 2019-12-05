@@ -77,24 +77,21 @@ def get_joke():
 
 def set_joke():
     try:
-
-        #joke = get_joke()
-        #w.fact_label.config(text = joke)
-
-        w.fact_label.config(text=random.randint(0,10))
+        
+        joke = get_joke()
+        w.fact_label.config(text = joke)
 
     except:
-
-        w.fact_label.config(text = "Error Getting Joke")
+        try:
+            w.fact_label.config(text = "Error Getting Joke{}".format(random.randint(0,9)))
+        except:
+            print("keyboard interrupt")
+            quit(0)
 
     
 def check_alert(now):
 
-    day = now.weekday()
-
-    #after this point, the method manually changes the alert message based on being between certain times and what day it is one. It is bad and must be fixed.
     block = get_block(now)
-    #short_now = time(now.hour, now.minute, 0, 0) #just hour and minutes
     if now.strftime('%H:%M') == block.get_start(now).time().strftime('%H:%M'):
         w.background_color("red")
 
@@ -195,7 +192,7 @@ def tick(time1 = '', date1 = ''):
 
 
 
-#set_joke()
+set_joke()
 
 # s = perpetualTimer(sched_set_joke, 679.8)
 s = perpetualTimer(set_joke, 0.5)
