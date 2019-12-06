@@ -55,7 +55,7 @@ def get_block(now):
 
 def get_joke():
 
-    headers = {'Accept': 'application/json'}
+    headers = {'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json'}
     return requests.get('https://icanhazdadjoke.com/', headers=headers).json().get('joke')
 
 def set_joke():
