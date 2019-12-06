@@ -59,7 +59,7 @@ def get_joke():
         headers = {'User-Agent': 'My Library (https://github.com/Enprogames/Python-Clock/)', 'Accept': 'application/json'}
         return requests.get('https://icanhazdadjoke.com/', headers=headers).json().get('joke')
     except:
-        f = open('tmp/dadjoke', 'r')
+        f = open('home/tmp/dadjoke', 'r')
         return f.read()
 
 def set_joke():
