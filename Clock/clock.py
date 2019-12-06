@@ -54,9 +54,13 @@ def get_block(now):
 #note to self: redo this whole function
 
 def get_joke():
-
-    headers = {'User-Agent': 'My Library (https://github.com/Enprogames/Python-Clock/)', 'Accept': 'application/json'}
-    return requests.get('https://icanhazdadjoke.com/', headers=headers).json().get('joke')
+    try:
+        #int("hello")
+        headers = {'User-Agent': 'My Library (https://github.com/Enprogames/Python-Clock/)', 'Accept': 'application/json'}
+        return requests.get('https://icanhazdadjoke.com/', headers=headers).json().get('joke')
+    except:
+        f = open('tmp/dadjoke', 'r')
+        return f.read()
 
 def set_joke():
     try:
@@ -179,7 +183,7 @@ def tick(time1 = '', date1 = ''):
 
 
 
-#set_joke()
+set_joke()
 
 # s = perpetualTimer(sched_set_joke, 679.8)
 s = perpetualTimer(set_joke, 60)
