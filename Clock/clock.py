@@ -6,8 +6,12 @@ from datetime import time, datetime
 import argparse
 # these must be installed on raspberry pi
 import requests
-from bs4 import BeautifulSoup as soup
+#from bs4 import BeautifulSoup as soup
 from threading import Thread, Timer, Event
+#import random
+#import urllib.request
+import sys
+import traceback
 
 message = "never gonna give you up"
 
@@ -49,49 +53,36 @@ def get_block(now):
 
 #note to self: redo this whole function
 
-def get_fact(date):
-
-    r = requests.get('http://numbersapi.com/{}/date?write&fragment'.format(date))
-
-    html_contents = r.text
-    for i in range(len(html_contents)):
-        if html_contents[i] == '\"':
-            html_contents = html_contents[i+1:-3]
-            break
-    
-    return html_contents
-
-
 def get_joke():
-
-    r = requests.get('https://icanhazdadjoke.com/')
-
-    html_contents = r.text
-    page_soup = soup(html_contents, 'html.parser')
-
-    joke = page_soup.findAll('p', {'class': 'subtitle'})
-
-    
-    
-    return joke[0].text
-
-
-def sched_set_joke():
-
-    joke = get_joke()
     try:
-        w.fact_label.config(text = joke)
+        #int("hello")
+        headers = {'User-Agent': 'My Library (https://github.com/Enprogames/Python-Clock/)', 'Accept': 'application/json'}
+        return requests.get('https://icanhazdadjoke.com/', headers=headers).json().get('joke')
     except:
-        w.fact_label.config(text = "Error Getting Joke")
+        f = open('/tmp/dadjoke', 'r')
+        return f.read()
+
+def set_joke():
+    try:
+
+        joke = get_joke()
+        w.fact_label.config(text = joke)
+
+    except Exception:
+        try:
+            #w.fact_label.config(text = "Error Getting Joke{}".format(random.randint(0,9)))
+            error = traceback.format_exc()
+            f = open("error_file.txt", "w+")
+            f.write(error)
+            w.fact_label.config(text="error recorded")
+        except:
+            print("keyboard interrupt")
+            quit(0)
 
     
 def check_alert(now):
 
-    day = now.weekday()
-
-    #after this point, the method manually changes the alert message based on being between certain times and what day it is one. It is bad and must be fixed.
     block = get_block(now)
-    #short_now = time(now.hour, now.minute, 0, 0) #just hour and minutes
     if now.strftime('%H:%M') == block.get_start(now).time().strftime('%H:%M'):
         w.background_color("red")
 
@@ -192,17 +183,10 @@ def tick(time1 = '', date1 = ''):
 
 
 
-# try:
-#     w.fact_label.config(text = get_joke())
-# except Exception as e:
-#     w.fact_label.config(text = e)
+set_joke()
 
 # s = perpetualTimer(sched_set_joke, 679.8)
-try:
-    s = perpetualTimer(sched_set_joke, 0.5)
-    s.start()
-except Exception as e:
-    w.fact_label.config(text=e)
-
+s = perpetualTimer(set_joke, 60)
+s.start()
 tick()
 w.frame.mainloop()
