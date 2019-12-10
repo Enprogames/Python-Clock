@@ -186,7 +186,7 @@ def tick(time1 = '', date1 = ''):
 set_joke()
 
 # s = perpetualTimer(sched_set_joke, 679.8)
-s = perpetualTimer(set_joke, 60)
+s = perpetualTimer(set_joke, 300)
 s.start()
 tick()
 w.frame.mainloop()
