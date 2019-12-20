@@ -12,6 +12,7 @@ from threading import Thread, Timer, Event
 #import urllib.request
 import sys
 import traceback
+import os.path
 
 message = "never gonna give you up"
 
@@ -109,6 +110,13 @@ def is_school(block):
         return False
     return True
 
+def does_file_exist(url):
+    if os.path.isfile(url):
+        return True
+    else:
+        return False
+
+
 
 def tick(time1 = '', date1 = ''):
 
@@ -182,11 +190,15 @@ def tick(time1 = '', date1 = ''):
     w.clock.after(500, tick) #calls tick every 1 millisecond
 
 
+if does_file_exist('flex') and schedule_override == None:
+    schedule_override = 'f'
+elif does_file_exist('normal') and schedule_override == None:
+    schedule_override = 'n'
 
 set_joke()
 
 # s = perpetualTimer(sched_set_joke, 679.8)
-s = perpetualTimer(set_joke, 60)
+s = perpetualTimer(set_joke, 300)
 s.start()
 tick()
 w.frame.mainloop()
