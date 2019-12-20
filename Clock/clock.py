@@ -52,8 +52,6 @@ def get_block(now):
     return blocks[-1]
 
 
-#note to self: redo this whole function
-
 def get_joke():
     try:
         #int("hello")
@@ -190,9 +188,9 @@ def tick(time1 = '', date1 = ''):
     w.clock.after(500, tick) #calls tick every 1 millisecond
 
 
-if does_file_exist('flex') and schedule_override == None:
+if does_file_exist('/tmp/flex') and schedule_override == None:
     schedule_override = 'f'
-elif does_file_exist('normal') and schedule_override == None:
+elif does_file_exist('/tmp/normal') and schedule_override == None:
     schedule_override = 'n'
 
 set_joke()
