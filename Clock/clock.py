@@ -13,8 +13,7 @@ from threading import Thread, Timer, Event
 import sys
 import traceback
 import os.path
-
-message = "never gonna give you up"
+import os
 
 parser = argparse.ArgumentParser(description = 'Control Elements of the Clock')
 parser.add_argument('-f', '--font', type = int, default=100, dest='font', required = False, help = '-f multiply font size for clock elements by an int')
@@ -117,19 +116,29 @@ def does_file_exist(url):
 
 
 def tick(time1 = '', date1 = ''):
+    global schedule_override
 
     now = datetime.now() #datetime object
     #now = datetime(now.year, now.month, 18, 15, 0, 1, 0)
     #now = datetime(now.year, now.month, 18, 11, 45, 1, 0)
 
     ############### Problem Zone ##################
+    
     day = datetime.now().weekday()
+    if does_file_exist('/tmp/flex') and schedule_override == None:
+        schedule_override = 'f'
+    elif does_file_exist('/tmp/normal') and schedule_override == None:
+        schedule_override = 'n'
+
+
     if (schedule_override == None and day == 2) or schedule_override == 'f':
         Read_Schedule(now, day='f')
     elif schedule_override == 'c':
         Read_Schedule(now, day='c')
     else:
         Read_Schedule(now)
+
+
 
     ############### Problem Zone ##################
 
@@ -154,8 +163,8 @@ def tick(time1 = '', date1 = ''):
     time2 = now.strftime('%H:%M:%S')
     date2 = now.strftime('%A, %B %d, %Y')
 
-    if (time2 == '08:55:00'):
-        Read_Schedule(now)
+    #if (time2 == '08:55:00'):
+        #Read_Schedule(now)
 
     #configure the clock gui
     w.clock.config(text=time2)
@@ -186,12 +195,6 @@ def tick(time1 = '', date1 = ''):
     # which only has takes the current hours and minutes into account
     check_alert(now)
     w.clock.after(500, tick) #calls tick every 1 millisecond
-
-
-if does_file_exist('/tmp/flex') and schedule_override == None:
-    schedule_override = 'f'
-elif does_file_exist('/tmp/normal') and schedule_override == None:
-    schedule_override = 'n'
 
 set_joke()
 
