@@ -130,6 +130,8 @@ def tick(time1 = '', date1 = ''):
         schedule_override = 'f'
     elif does_file_exist('/tmp/normal') and schedule_override == None:
         schedule_override = 'n'
+    else:
+        w.fact_label.config(text="flex file not found")
 
 
     if (schedule_override == None and day == 2) or schedule_override == 'f':
