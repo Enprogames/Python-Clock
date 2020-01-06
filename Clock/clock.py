@@ -46,6 +46,7 @@ class perpetualTimer():
 
 def get_block(now):
     for x in range(len(blocks)-1):
+        print(blocks[x])
         if blocks[x].is_current_block(now):
             return blocks[x]
     return blocks[-1]
@@ -134,9 +135,9 @@ def tick(time1 = '', date1 = ''):
     if (schedule_override == None and day == 2) or schedule_override == 'f':
         w.fact_label.config(text="setting to flex")
 
-        Read_Schedule(now, day='f')
+        Read_Schedule(now, 'f')
     elif schedule_override == 'c':
-        Read_Schedule(now, day='c')
+        Read_Schedule(now, 'c')
     else:
         Read_Schedule(now)
 
@@ -164,9 +165,6 @@ def tick(time1 = '', date1 = ''):
     days_till_summer = pretty_time_delta(days_till_summer.total_seconds())
     time2 = now.strftime('%H:%M:%S')
     date2 = now.strftime('%A, %B %d, %Y')
-
-    #if (time2 == '08:55:00'):
-        #Read_Schedule(now)
 
     #configure the clock gui
     w.clock.config(text=time2)
