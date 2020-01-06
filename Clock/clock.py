@@ -114,7 +114,6 @@ def does_file_exist(url):
         return False
 
 
-
 def tick(time1 = '', date1 = ''):
     global schedule_override
 
@@ -126,13 +125,14 @@ def tick(time1 = '', date1 = ''):
     
     day = datetime.now().weekday()
     if does_file_exist('/tmp/flex') and schedule_override == None:
+        w.fact_label.config(text="setting to flex schedule")
+        w.background_color('blue')
         schedule_override = 'f'
     elif does_file_exist('/tmp/normal') and schedule_override == None:
         schedule_override = 'n'
 
 
     if (schedule_override == None and day == 2) or schedule_override == 'f':
-        w.fact_label.config(text="setting to flex schedule")
         Read_Schedule(now, day='f')
     elif schedule_override == 'c':
         Read_Schedule(now, day='c')
