@@ -132,6 +132,7 @@ def tick(time1 = '', date1 = ''):
 
 
     if (schedule_override == None and day == 2) or schedule_override == 'f':
+        w.fact_label.config(text="setting to flex schedule")
         Read_Schedule(now, day='f')
     elif schedule_override == 'c':
         Read_Schedule(now, day='c')
