@@ -2,6 +2,7 @@ from datetime import time, date, datetime, timedelta
 import csv
 #import platform
 
+global blocks
 blocks = [] # an array of block objects
 startsstring = []
 endsstring   = []
@@ -12,6 +13,7 @@ current_block = ''
 time_till_next = 0
 block_delta = 0
 file_path = "/home/pi/Python-Clock/Clock/sched.csv"
+#file_path = 'sched.csv'
 # try:
 #     dist_name = platform.dist()[0]
 # except:
@@ -75,8 +77,11 @@ def pretty_time_delta(seconds):
         return '%s%ds' % (sign_string, seconds)
 
 def Read_Schedule(now, day = "n"):
-    #print(dist_name)
-    num_lines = sum(1 for line in open(file_path))
+
+    #global blocks
+    del blocks[:]
+
+    num_lines = sum(1 for _ in open(file_path))
     custom_length = num_lines - 24 #length of the custom schedule
     with open(file_path, 'r') as file:
         #days of week
@@ -101,9 +106,8 @@ def Read_Schedule(now, day = "n"):
         
 
         #Note to self: Redo everything after this point
-        if len(blocks) - 1 < duration:
+        if len(blocks) - 1 < duration: # does not run because blocks is not reset
             for line in reader:
-
                 startsstring.append(line[1])
                 endsstring.append(line[2])
 
@@ -123,9 +127,6 @@ def Read_Schedule(now, day = "n"):
                 num = time(listE[0], listE[1], listE[2])
                 ends.append(num)
 
-                #print(starts[count], ends[count], line[0])
-                #print(count, duration)
-                #print(line[0][0:5].lower())
                 if now.weekday() == 4: # friday end blocks 5 minutes early.
                     
                     #blocks will be ended 5 minutes early by subtracting 5 minutes from the end of each block 
@@ -200,6 +201,8 @@ def Read_Schedule(now, day = "n"):
                 if count > duration:
                     break
                 count += 1
+
+    #print(len(blocks))
                 
         #blocks.append(Block(time(),time(),"Break"))
 

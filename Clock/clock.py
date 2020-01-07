@@ -45,8 +45,8 @@ class perpetualTimer():
       self.thread.cancel()
 
 def get_block(now):
+
     for x in range(len(blocks)-1):
-        print(blocks[x])
         if blocks[x].is_current_block(now):
             return blocks[x]
     return blocks[-1]
@@ -54,7 +54,6 @@ def get_block(now):
 
 def get_joke():
     try:
-        #int("hello")
         headers = {'User-Agent': 'My Library (https://github.com/Enprogames/Python-Clock/)', 'Accept': 'application/json'}
         return requests.get('https://icanhazdadjoke.com/', headers=headers).json().get('joke')
     except:
@@ -130,6 +129,8 @@ def tick(time1 = '', date1 = ''):
         schedule_override = 'f'
     elif does_file_exist('/tmp/normal') and schedule_override == None:
         schedule_override = 'n'
+    elif not does_file_exist('/tmp/flex') and not does_file_exist('/tmp/normal') and parser.parse_args().schedule == None:
+        schedule_override = None
 
 
     if (schedule_override == None and day == 2) or schedule_override == 'f':
@@ -145,18 +146,14 @@ def tick(time1 = '', date1 = ''):
 
     ############### Problem Zone ##################
 
-    
 
     block = get_block(now)
 
-    block_start = block.get_start(now)
-    block_end = block.get_end(now)
+    time_till_start = block.get_start(now) - now
 
-    time_till_start = block_start - now
-    #print(time_till_start)
     time_till_start = hours_minutes_seconds(time_till_start)
-    time_till_end = block_end - now
-    #print(time_till_end)
+    time_till_end = block.get_end(now) - now
+
     time_till_end = hours_minutes_seconds(time_till_end)
     summer = datetime(now.year, 7, 1, 0, 0, 0, 0)
     if now > summer:
