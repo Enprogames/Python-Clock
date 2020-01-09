@@ -34,6 +34,7 @@ class Block:
         now = now.time()
 
         if self.start < now < self.end:
+            #print(self.name, self.start, self.end)
             return True
         return False
 
@@ -76,6 +77,7 @@ def pretty_time_delta(seconds):
     else:
         return '%s%ds' % (sign_string, seconds)
 
+#when reading the schedule after changing to or from flex, the names of the blocks change but the number of blocks and their start/end times stay the same
 def Read_Schedule(now, day = "n"):
 
     #global blocks
@@ -127,6 +129,7 @@ def Read_Schedule(now, day = "n"):
                 num = time(listE[0], listE[1], listE[2])
                 ends.append(num)
 
+                #print(duration)
                 if now.weekday() == 4: # friday end blocks 5 minutes early.
                     
                     #blocks will be ended 5 minutes early by subtracting 5 minutes from the end of each block 
@@ -201,8 +204,7 @@ def Read_Schedule(now, day = "n"):
                 if count > duration:
                     break
                 count += 1
-
-    #print(len(blocks))
+    print(blocks[3].name, blocks[3].start, blocks[3].end)
                 
         #blocks.append(Block(time(),time(),"Break"))
 
