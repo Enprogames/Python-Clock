@@ -4,8 +4,6 @@ import csv
 
 global blocks
 blocks = [] # an array of block objects
-startsstring = []
-endsstring   = []
 starts = [] # an array of starting times for the blocks
 ends   = [] # an array of ending times for the blocks
 nowTotalSeconds = 0
@@ -82,6 +80,8 @@ def Read_Schedule(now, day = "n"):
 
     #global blocks
     del blocks[:]
+    del starts[:]
+    del ends[:]
 
     num_lines = sum(1 for _ in open(file_path))
     custom_length = num_lines - 24 #length of the custom schedule
@@ -108,27 +108,19 @@ def Read_Schedule(now, day = "n"):
         
 
         #Note to self: Redo everything after this point
-        if len(blocks) - 1 < duration: # does not run because blocks is not reset
+        if len(blocks) - 1 < duration: # start and end times get messed up for some reason #######################
+
             for line in reader:
-                startsstring.append(line[1])
-                endsstring.append(line[2])
 
                 # a horrible way to create a datetime object. these variables are used to split up the starting and ending
                 # times (which are in the form of strings) into lists ([hours, minutes, seconds]). At least 2 steps
                 # of this process could be cut out
-                listS = startsstring[count].split(':')
-                listE = endsstring[count].split(':')
 
-                for i in range(len(listS)):
-                    listS[i] = int(listS[i])
-                num = time(listS[0], listS[1], listS[2])
-                starts.append(num)
+                starts.append(time(int(line[1].split(':')[0]), int(line[1].split(':')[1]), int(line[1].split(':')[2])))
 
-                for i in range(len(listE)):
-                    listE[i] = int(listE[i])
-                num = time(listE[0], listE[1], listE[2])
-                ends.append(num)
+                ends.append(time(int(line[2].split(':')[0]), int(line[2].split(':')[1]), int(line[2].split(':')[2])))
 
+###########################################################################################################
                 #print(duration)
                 if now.weekday() == 4: # friday end blocks 5 minutes early.
                     
@@ -204,7 +196,8 @@ def Read_Schedule(now, day = "n"):
                 if count > duration:
                     break
                 count += 1
-    print(blocks[3].name, blocks[3].start, blocks[3].end)
+    #print(blocks[3].name, blocks[3].start, blocks[3].end)
+    #print(startsstring)
                 
         #blocks.append(Block(time(),time(),"Break"))
 
