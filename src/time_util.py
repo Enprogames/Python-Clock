@@ -1,5 +1,6 @@
 from datetime import time, date, datetime, timedelta
 import csv
+import os
 
 blocks = [] # an array of block objects
 startsstring = []
@@ -10,7 +11,7 @@ nowTotalSeconds = 0
 current_block = ''
 time_till_next = 0
 block_delta = 0
-file_path = "sched.csv"
+file_path = "sched.csv" if os.path.dirname(os.getcwd()) == 'src' else "src/sched.csv"
 
 class Block:
 
