@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\e_pos\OneDrive\Projects\VSCodeProjects\Python\Python-Clock\src\clock.py", line 67, in set_joke
+    f = open("error_file.txt", "w+")
+  File "C:\Users\e_pos\AppData\Local\Programs\Python\Python39\lib\tkinter\__init__.py", line 1646, in configure
+    return self._configure('configure', cnf, kw)
+  File "C:\Users\e_pos\AppData\Local\Programs\Python\Python39\lib\tkinter\__init__.py", line 1636, in _configure
+    self.tk.call(_flatten((self._w, cmd)) + self._options(cnf))
+RuntimeError: main thread is not in main loop

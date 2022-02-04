@@ -2,16 +2,18 @@ from datetime import time, date, datetime, timedelta
 import csv
 import os
 
-blocks = [] # an array of block objects
+blocks = []  # an array of block objects
 startsstring = []
-endsstring   = []
-starts = [] # an array of starting times for the blocks
-ends   = [] # an array of ending times for the blocks
+endsstring = []
+starts = []  # an array of starting times for the blocks
+ends = []  # an array of ending times for the blocks
 nowTotalSeconds = 0
 current_block = ''
 time_till_next = 0
 block_delta = 0
-file_path = "sched.csv" if os.path.dirname(os.getcwd()) == 'src' else "src/sched.csv"
+file_path = "sched.csv" if os.path.dirname(
+    os.getcwd()) == 'src' else "src/sched.csv"
+
 
 class Block:
 
@@ -19,7 +21,8 @@ class Block:
         self.start = start
         self.end = end
         self.name = name
-        self.block_type = block_type # types of blocks: before_school, first, normal, break, lunch, after_school
+        # types of blocks: before_school, first, normal, break, lunch, after_school
+        self.block_type = block_type
 
     def __str__(self):
         return self.name
@@ -32,15 +35,19 @@ class Block:
         return False
 
     def get_start(self, now):
-        start_dt = datetime(now.year, now.month, now.day, self.start.hour, self.start.minute, self.start.second, self.start.microsecond)
+        start_dt = datetime(now.year, now.month, now.day, self.start.hour,
+                            self.start.minute, self.start.second, self.start.microsecond)
         return start_dt
 
     def get_end(self, now):
-        end_dt = datetime(now.year, now.month, now.day, self.end.hour, self.end.minute, self.end.second, self.end.microsecond)
+        end_dt = datetime(now.year, now.month, now.day, self.end.hour,
+                          self.end.minute, self.end.second, self.end.microsecond)
         return end_dt
+
     def get_type(self):
         return self.block_type
-    
+
+
 def totalSeconds(x):
     hour = x.hour * 3600
     minutes = x.minute * 60
@@ -48,12 +55,15 @@ def totalSeconds(x):
     nowTotal = hour + minutes + seconds
     return nowTotal
 
-def hours_minutes_seconds(td): #hide hours if it equals 0, minutes and seconds always 2 digits
+
+# hide hours if it equals 0, minutes and seconds always 2 digits
+def hours_minutes_seconds(td):
     hours = td.seconds // 3600
     minutes = (td.seconds % 3600) // 60
     seconds = (td.seconds % 60)
 
     return '{}:{:02}:{:02}'.format(hours, minutes, seconds)
+
 
 def pretty_time_delta(seconds):
     sign_string = '-' if seconds < 0 else ''
@@ -70,32 +80,33 @@ def pretty_time_delta(seconds):
     else:
         return '%s%ds' % (sign_string, seconds)
 
-def Read_Schedule(now, day = "n"):
-    num_lines = sum(1 for line in open(file_path))
-    custom_length = num_lines - 24 #length of the custom schedule
-    with open(file_path, 'r') as file:
-        #days of week
-        #0 = monday, 1 = tuesday, 2 = wednesday, 3 = thursday, 4 = friday, 5 = saturday, 6 = sunday
-        reader = csv.reader(file)
-        count = 0 #iteration count for loop
 
-        next(reader) #skips the instructional line in the csv file
+def Read_Schedule(now, day="n"):
+    num_lines = sum(1 for line in open(file_path))
+    custom_length = num_lines - 24  # length of the custom schedule
+    with open(file_path, 'r') as file:
+        # days of week
+        # 0 = monday, 1 = tuesday, 2 = wednesday, 3 = thursday, 4 = friday, 5 = saturday, 6 = sunday
+        reader = csv.reader(file)
+        count = 0  # iteration count for loop
+
+        next(reader)  # skips the instructional line in the csv file
 
         if day == 'f':
             duration = 11
             for i in range(9):
                 next(reader)
-                
+
         elif day == 'c':
-            duration = custom_length - 2 #length of the custom schedule minus the before and after school times
+            # length of the custom schedule minus the before and after school times
+            duration = custom_length - 2
             for i in range(23):
                 next(reader)
-            
-        else:
-            duration = 7 #how many blocks are in the day not including before and after school
-        
 
-        #Note to self: Redo everything after this point
+        else:
+            duration = 7  # how many blocks are in the day not including before and after school
+
+        # Note to self: Redo everything after this point
         if len(blocks) - 1 < duration:
             for line in reader:
 
@@ -117,89 +128,101 @@ def Read_Schedule(now, day = "n"):
                     listE[i] = int(listE[i])
                 num = time(listE[0], listE[1], listE[2])
                 ends.append(num)
+                if now.weekday() == 4:  # friday end blocks 5 minutes early.
 
-                #print(starts[count], ends[count], line[0])
-                #print(count, duration)
-                #print(line[0][0:5].lower())
-                if now.weekday() == 4: # friday end blocks 5 minutes early.
-                    
-                    #blocks will be ended 5 minutes early by subtracting 5 minutes from the end of each block 
+                    # blocks will be ended 5 minutes early by subtracting 5 minutes from the end of each block
                     # and subtracting 5 minutes from the start of each break/lunch
 
-                    if count == 1: # first block
+                    if count == 1:  # first block
 
-                        endminus5minutes = datetime.combine(date.today(), (starts[count])) - datetime.combine(date.today(), time(0,5,0))
-                        endminus5minutes = (datetime.min+endminus5minutes).time()
-                        blocks.append(Block(starts[count], endminus5minutes, line[0], 'first'))
+                        endminus5minutes = datetime.combine(
+                            date.today(), (starts[count])) - datetime.combine(date.today(), time(0, 5, 0))
+                        endminus5minutes = (
+                            datetime.min+endminus5minutes).time()
+                        blocks.append(
+                            Block(starts[count], endminus5minutes, line[0], 'first'))
 
                     elif line[0][0:5].lower() == 'break':
 
-                        startminus5minutes = datetime.combine(date.today(), (starts[count])) - datetime.combine(date.today(), time(0,5,0))
-                        startminus5minutes = (datetime.min+startminus5minutes).time()
-                        blocks.append(Block(startminus5minutes, ends[count], line[0], 'break'))
+                        startminus5minutes = datetime.combine(
+                            date.today(), (starts[count])) - datetime.combine(date.today(), time(0, 5, 0))
+                        startminus5minutes = (
+                            datetime.min+startminus5minutes).time()
+                        blocks.append(Block(startminus5minutes,
+                                      ends[count], line[0], 'break'))
 
-                    elif line[0][0:5].lower() == 'lunch': # (break)
+                    elif line[0][0:5].lower() == 'lunch':  # (break)
 
-                        startminus5minutes = datetime.combine(date.today(), (starts[count])) - datetime.combine(date.today(), time(0,5,0))
-                        startminus5minutes = (datetime.min+startminus5minutes).time()
-                        blocks.append(Block(startminus5minutes, ends[count], line[0], 'lunch'))
+                        startminus5minutes = datetime.combine(
+                            date.today(), (starts[count])) - datetime.combine(date.today(), time(0, 5, 0))
+                        startminus5minutes = (
+                            datetime.min+startminus5minutes).time()
+                        blocks.append(Block(startminus5minutes,
+                                      ends[count], line[0], 'lunch'))
 
-                    elif count == 0: # before school (doesn't need to be changed)
+                    # before school (doesn't need to be changed)
+                    elif count == 0:
 
-                        blocks.append(Block(starts[count], ends[count], line[0], 'before_school'))
+                        blocks.append(
+                            Block(starts[count], ends[count], line[0], 'before_school'))
 
-                    elif count == duration + 1: # working (break)
+                    elif count == duration + 1:  # working (break)
 
-                        startminus5minutes = datetime.combine(date.today(), (starts[count])) - datetime.combine(date.today(), time(0,5,0))
-                        startminus5minutes = (datetime.min+startminus5minutes).time()
-                        blocks.append(Block(startminus5minutes, ends[count], line[0], 'after_school'))
+                        startminus5minutes = datetime.combine(
+                            date.today(), (starts[count])) - datetime.combine(date.today(), time(0, 5, 0))
+                        startminus5minutes = (
+                            datetime.min+startminus5minutes).time()
+                        blocks.append(Block(startminus5minutes,
+                                      ends[count], line[0], 'after_school'))
 
-                    elif count == duration: # working
+                    elif count == duration:  # working
 
-                        startminus5minutes = datetime.combine(date.today(), (ends[count])) - datetime.combine(date.today(), time(0,5,0))
-                        startminus5minutes = (datetime.min+startminus5minutes).time()
-                        blocks.append(Block(starts[count], startminus5minutes, line[0], 'last'))
-                        
+                        startminus5minutes = datetime.combine(
+                            date.today(), (ends[count])) - datetime.combine(date.today(), time(0, 5, 0))
+                        startminus5minutes = (
+                            datetime.min+startminus5minutes).time()
+                        blocks.append(
+                            Block(starts[count], startminus5minutes, line[0], 'last'))
+
                     else:
-                        blocks.append(Block(starts[count], ends[count], line[0], 'normal'))
-                else: # not friday
+                        blocks.append(
+                            Block(starts[count], ends[count], line[0], 'normal'))
+                else:  # not friday
 
                     if count == 1:
-                        
-                        blocks.append(Block(starts[count], ends[count], line[0], 'first'))
+
+                        blocks.append(
+                            Block(starts[count], ends[count], line[0], 'first'))
 
                     elif line[0][0:5].lower() == 'break':
-                        
-                        blocks.append(Block(starts[count], ends[count], line[0], 'break'))
+
+                        blocks.append(
+                            Block(starts[count], ends[count], line[0], 'break'))
 
                     elif line[0][0:5].lower() == 'lunch':
-                        
-                        blocks.append(Block(starts[count], ends[count], line[0], 'lunch'))
+
+                        blocks.append(
+                            Block(starts[count], ends[count], line[0], 'lunch'))
 
                     elif count == 0:
-                        
-                        blocks.append(Block(starts[count], ends[count], line[0], 'before_school'))
+
+                        blocks.append(
+                            Block(starts[count], ends[count], line[0], 'before_school'))
 
                     elif count == duration + 1:
-                        
-                        blocks.append(Block(starts[count], ends[count], line[0], 'after_school'))
+
+                        blocks.append(
+                            Block(starts[count], ends[count], line[0], 'after_school'))
 
                     elif count == duration:
-                        
-                        blocks.append(Block(starts[count], ends[count], line[0], 'last'))
-                        
+
+                        blocks.append(
+                            Block(starts[count], ends[count], line[0], 'last'))
+
                     else:
-                        blocks.append(Block(starts[count], ends[count], line[0], 'normal'))
-                    
+                        blocks.append(
+                            Block(starts[count], ends[count], line[0], 'normal'))
 
                 if count > duration:
                     break
                 count += 1
-                
-        #blocks.append(Block(time(),time(),"Break"))
-
-        #for x in range(len(blocks)):
-        #    print(blocks[x].name, blocks[x].start, blocks[x].end)
-        #print(str(blocks))
-
-
