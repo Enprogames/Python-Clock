@@ -1,4 +1,6 @@
-from time_util import *
+#!/usr/bin/env python
+
+import time_util
 import window as w
 from datetime import datetime
 import argparse
@@ -42,15 +44,14 @@ class perpetualTimer():
 
 
 def get_block(now):
-    for x in range(len(blocks)-1):
-        if blocks[x].is_current_block(now):
-            return blocks[x]
-    return blocks[-1]
+    for x in range(len(time_util.blocks)-1):
+        if time_util.blocks[x].is_current_block(now):
+            return time_util.blocks[x]
+    return time_util.blocks[-1]
 
 
 def get_joke():
     try:
-        # int("hello")
         headers = {'User-Agent': 'My Library (https://github.com/Enprogames/Python-Clock/)', 'Accept': 'application/json'}
         return requests.get('https://icanhazdadjoke.com/', headers=headers).json().get('joke')
     except:
@@ -66,7 +67,6 @@ def set_joke():
 
     except Exception:
         try:
-            #w.fact_label.config(text = "Error Getting Joke{}".format(random.randint(0,9)))
             error = traceback.format_exc()
             f = open("error_file.txt", "w+")
             f.write(error)
@@ -117,13 +117,9 @@ def tick(time1='', date1=''):
     global schedule_override
 
     now = datetime.now()  # datetime object
-    #now = datetime(now.year, now.month, 18, 15, 0, 1, 0)
-    #now = datetime(now.year, now.month, 18, 11, 45, 1, 0)
-
-    ############### Problem Zone ##################
 
     day = datetime.now().weekday()
-    if does_file_exist('/tmp/flex') and schedule_override == None:
+    if does_file_exist('/tmp/flex') and schedule_override is None:
         w.fact_label.config(text="setting to flex schedule")
         w.background_color('blue')
         schedule_override = 'f'
@@ -131,11 +127,11 @@ def tick(time1='', date1=''):
         schedule_override = 'n'
 
     if (schedule_override == None and day == 2) or schedule_override == 'f':
-        Read_Schedule(now, day='f')
+        time_util.Read_Schedule(now, day='f')
     elif schedule_override == 'c':
-        Read_Schedule(now, day='c')
+        time_util.Read_Schedule(now, day='c')
     else:
-        Read_Schedule(now)
+        time_util.Read_Schedule(now)
 
     ############### Problem Zone ##################
 
@@ -146,24 +142,20 @@ def tick(time1='', date1=''):
 
     time_till_start = block_start - now
     # print(time_till_start)
-    time_till_start = hours_minutes_seconds(time_till_start)
+    time_till_start = time_util.hours_minutes_seconds(time_till_start)
     time_till_end = block_end - now
     # print(time_till_end)
-    time_till_end = hours_minutes_seconds(time_till_end)
+    time_till_end = time_util.hours_minutes_seconds(time_till_end)
     summer = datetime(now.year, 7, 1, 0, 0, 0, 0)
     if now > summer:
         summer = datetime(now.year+1, 7, 1, 0, 0, 0, 0)
     days_till_summer = summer - now
-    days_till_summer = pretty_time_delta(days_till_summer.total_seconds())
+    days_till_summer = time_util.pretty_time_delta(days_till_summer.total_seconds())
     time2 = now.strftime('%H:%M:%S')
     date2 = now.strftime('%A, %B %d, %Y')
 
-    # if (time2 == '08:55:00'):
-    # Read_Schedule(now)
-
     # configure the clock gui
     w.clock.config(text=time2)
-    #w.currentLabel.config(text = "Block: {}".format(block))
     w.date.config(text=date2)
     if block.get_type == 'break' or block.get_type == 'lunch':
         w.remainingLabel.config(text="Time Until Block Start:\n {}".format(time_till_end))
@@ -175,7 +167,6 @@ def tick(time1='', date1=''):
     # shoes time till summer if school is not in session
     if is_school(block):
         w.time_till_summer.config(fg='grey25')
-        #w.time_till_summer.config(fg = 'white')
         w.time_till_summer.place(relx=.9, rely=0.85, anchor="n")
         w.remainingLabel.config(font=('Helvetica', int(font_size/2), 'normal'))  # default font/2
         w.remainingLabel.place(relx=.5, rely=.8, anchor="n")
