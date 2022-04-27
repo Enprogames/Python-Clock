@@ -25,16 +25,18 @@ class ClockFrameTk(tk.Frame):
     - optional time until summer
     """
 
-    def __init__(self, parent, schedule_handler=None, fact_handler=None, bg='#263238', fg='white', width=600,
+    def __init__(self, parent, schedule_handler=None, fact_handler=None, background='#263238', foreground='white', width=600,
                  height=400, font='Arial', font_size=100, font_multiplier=1,
                  event_text='event', show_time=True, show_date=True, show_fact=True, show_alert=True,
                  show_remaining=True, show_summer=False, resize_dynamically=True, **kwargs):
-        tk.Frame.__init__(self, parent, bg=bg, width=width, height=height)
 
-        self.bg = bg
-        self.fg = fg
+        self.bg = background
+        self.fg = foreground
         self.width = width
         self.height = height
+
+        tk.Frame.__init__(self, parent, bg=self.bg, width=self.width, height=self.height)
+
         self.font = font
         self.font_size = font_size
         self.font_multiplier = font_multiplier
