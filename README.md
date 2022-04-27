@@ -22,7 +22,7 @@ A school clock written in python with a customizable schedule.
         - On linux: `python3 -m venv venv --prompt python-clock`
         - On windows: `python -m venv venv --prompt python-clock`
     2. Activate virtual environment
-        - On linux: source venv/bin/activate
+        - On linux: `source venv/bin/activate`
         - On windows: `source venv/Scripts/activate`
     3. Update python package manager (PIP) to latest version
         - `python -m pip install --upgrade pip`
@@ -30,6 +30,12 @@ A school clock written in python with a customizable schedule.
         - `python -m pip install -r requirements.txt`
     5. Setup pre-commit hooks (optional if not contributing to project). This stops you from committing files which are improperly formatted.
         - `python -m pre_commit install`
+    6. Make sure tkinter is installed, as this is the GUI library used. On linux, run `sudo apt-get install python3-tk`.
+
+## Usage
+1. Run the `main.pyw` file from the root of the project.
+    1. On linux: `src/main.pyw`
+    2. On windows: 'python3 src/main.pyw`
 
 ## Creating Custom Schedules
 
@@ -58,7 +64,7 @@ Coming soon...
     - [ ] CRUDL menu for schedule
     - [ ] Fully customizable color scheme
 
-- [ ] Use pack() layout manager instead of place() for better handling of different display sizes
+- [ ] Transition to using eel instead of tkinter
 
 ## License
 
