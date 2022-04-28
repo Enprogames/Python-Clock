@@ -3,7 +3,7 @@
         "background": "#263238",
         "foreground": "white",  // text and other widgets
         "fullscreen": false,
-        "window_manager": "tkinter",  // options: ["tkinter"]. Future options: ["tkinter-canvas", "eel", "electron"]
+        "window_manager": "tkinter",  // options: ["tkinter"]. Future options: ["tkinter-canvas", "eel"]
         "event_text": "Block",
         "show_time": true,
         "show_date": true,
@@ -11,7 +11,7 @@
         "show_alert": true,  // e.g. "Block: Lunch"
         "show_remaining": true,
         "show_summer": false,  // displays how long until the summer holidays start
-        "fact_type": "dadjoke", // options: ["fact", "joke", "dadjoke"]
+        "fact_type": "dadjoke", // options: ["dadjoke"]. Future options: ["fact", "joke"]
         "font_multiplier": 1,
         "resize_dynamically": true,
         "font_size": 100,  // use if dynamic resizing isn't enabled

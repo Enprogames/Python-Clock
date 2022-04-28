@@ -13,7 +13,7 @@ import pyjson5
 # module level imports
 from window import MainWindow
 from time_util import ScheduleHandler
-from fact_util import JokeHandler
+from fact_util import FactHandler
 
 
 ROOT_DIR = ''
@@ -116,7 +116,7 @@ with open(SETTINGS_PATH, 'r') as f:
 
 sched_handler = ScheduleHandler(sched_data=setting_json['schedules'])
 
-fact_handler = JokeHandler()
+fact_handler = FactHandler()
 
 window = MainWindow(schedule_handler=sched_handler,
                     fact_handler=fact_handler,

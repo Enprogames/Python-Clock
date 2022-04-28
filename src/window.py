@@ -1,6 +1,7 @@
 import tkinter as tk
 import datetime as dt
 import os
+import traceback
 import eel
 
 from time_util import ScheduleHandler
@@ -161,21 +162,29 @@ class ClockFrameTk(tk.Frame):
         # update fact_label if 60 seconds have passed since the last update
         if self.show_fact and self.fact_handler:
             if (now - self.last_fact_time).seconds > 60:
-                self.fact = self.fact_handler.get()
+                self.fact_handler.request_new()
             self.last_fact_time = dt.datetime.now()
-            self.fact_label.config(fg=self.fg, text=self.fact)
+            self.fact_label.config(fg=self.fg, text=self.fact_handler.get())
         else:
             self.fact_label.config(fg=self.bg)
 
         # display the name of the current event
         if self.show_alert and self.schedule_handler:
-            self.alert_label.config(fg=self.fg, text=self.schedule_handler.get_current_events_str())
+            try:
+                self.alert_label.config(fg=self.fg, text=self.schedule_handler.get_current_events_str())
+            except AttributeError:
+                print(f"Error getting event info from schedule_handler. Exception: {traceback.print_exc()}")
+                self.alert_label.config(fg=self.fg, text="")
         else:
             self.alert_label.config(fg=self.bg)
 
         # update remaining_label with time remaining until next event or event end
         if self.show_remaining and self.schedule_handler:
-            self.remaining_label.config(fg=self.fg, text=self.schedule_handler.get_remaining_str_verbose())
+            try:
+                self.remaining_label.config(fg=self.fg, text=self.schedule_handler.get_remaining_str_verbose())
+            except AttributeError:
+                print(f"Error getting event info from schedule_handler. Exception: {traceback.print_exc()}")
+                self.remaining_label.config(fg=self.fg, text="")
         else:
             self.remaining_label.config(fg=self.bg)
 
