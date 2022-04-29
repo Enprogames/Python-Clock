@@ -1,4 +1,6 @@
 {
+    "fact_type": "dadjoke", // options: ["dadjoke"]. Future options: ["fact", "joke"]
+
     "window_settings": {
         "background": "#263238",
         "foreground": "white",  // text and other widgets
@@ -11,10 +13,10 @@
         "show_alert": true,  // e.g. "Block: Lunch"
         "show_remaining": true,
         "show_summer": false,  // displays how long until the summer holidays start
-        "fact_type": "dadjoke", // options: ["dadjoke"]. Future options: ["fact", "joke"]
+
         "font_multiplier": 1,
         "resize_dynamically": true,
-        "font_size": 100,  // use if dynamic resizing isn't enabled
+        "font_size": 100  // only used if dynamic resizing is false
     },
     "schedules": {
         "Default Schedule": {
@@ -44,7 +46,7 @@
                 "Flex 2": ["14:15", "15:05"]
             }
         },
-        "Remebrance Day Schedule": {
+        "Remembrance Day Schedule": {
             "default": "Break",
             "months": ["november"],
             "days_of_month": [8],

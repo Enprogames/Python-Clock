@@ -4,8 +4,6 @@ import os
 import traceback
 import eel
 
-from time_util import ScheduleHandler
-
 
 ROOT_DIR = ''
 if os.path.basename(os.getcwd()) == 'src':
@@ -86,10 +84,11 @@ class ClockFrameTk(tk.Frame):
             self.time_till_summer_label.place(relx=.75, rely=.8, anchor='s')
         self.widgets.append(self.time_till_summer_label)
 
+        self.fact_label.lower()  # this can sometimes become very large, so it should appear underneath other widgetes
+
         if resize_dynamically:
             self.resize_dynamically()
             self.winfo_toplevel().bind("<Configure>", self.resize_dynamically)
-
 
     def set_fg(self, fg):
         self.fg = fg
@@ -128,8 +127,8 @@ class ClockFrameTk(tk.Frame):
 
         current_font = self.fact_label.cget("font").split(' ')
         current_font[1] = font_size/4
-        self.fact_label.config(width=self.winfo_toplevel().winfo_width()-100, font=(current_font[0], int(current_font[1]), current_font[2]),
-                               wraplength=self.fact_label.winfo_width())
+        self.fact_label.config(font=(current_font[0], int(current_font[1]), current_font[2]),
+                               wraplength=self.winfo_toplevel().winfo_width()-50)
 
         current_font = self.alert_label.cget("font").split(' ')
         current_font[1] = font_size/2
@@ -259,7 +258,7 @@ class GUIWindowTk(tk.Tk):
     :type icon_file: ``str``
     ...
 
-    :param \**kwargs:
+    :param **kwargs:
         See below
 
     :Keyword Arguments:
@@ -319,6 +318,7 @@ class GUIWindowEel:
     """
     A clock window created using the eel gui framework
     """
+
     def __init__(self):
         eel.init()
 
