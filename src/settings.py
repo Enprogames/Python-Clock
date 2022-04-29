@@ -3,7 +3,7 @@ import pyjson5
 
 DEFAULT_SETTINGS = """
 {
-    "fact_type": "dadjoke", // options: ["dadjoke"]. Future options: ["fact", "joke"]
+    "fact_type": "dadjoke", // options: ["dadjoke", "fact"]
 
     "window_settings": {
         "background": "#263238",

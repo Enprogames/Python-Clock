@@ -1,5 +1,5 @@
 {
-    "fact_type": "dadjoke", // options: ["dadjoke"]. Future options: ["fact", "joke"]
+    "fact_type": "fact", // options: ["dadjoke", "fact"]
 
     "window_settings": {
         "background": "#263238",

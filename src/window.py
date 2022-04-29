@@ -162,7 +162,7 @@ class ClockFrameTk(tk.Frame):
         if self.show_fact and self.fact_handler:
             if (now - self.last_fact_time).seconds > 60:
                 self.fact_handler.request_new()
-            self.last_fact_time = dt.datetime.now()
+                self.last_fact_time = dt.datetime.now()
             self.fact_label.config(fg=self.fg, text=self.fact_handler.get())
         else:
             self.fact_label.config(fg=self.bg)
