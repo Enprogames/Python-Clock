@@ -1,7 +1,8 @@
 import datetime as dt
-import json
 import traceback
 from typing import List
+
+import pyjson5
 
 
 class Event:
@@ -60,7 +61,7 @@ class Schedule:
         if not sched_data:
             try:
                 with open(sched_path, 'r') as f:
-                    sched_data = json.load(f)
+                    sched_data = pyjson5.decode_io(f, None, False)
             except Exception:
                 print(f"Schedule at '{sched_path}' not found. Exception: {traceback.format_exc()}")
 
@@ -104,7 +105,8 @@ class Schedule:
 
             now = dt.datetime.now()
             if not (prev or next):  # no events exist, so return an event spanning the entire day
-                active_events.append(Event(self.default_name, dt.datetime(now.year, now.month, now.day, 0, 0, 0), dt.datetime(now.year, now.month, now.day, 23, 59, 59)))
+                active_events.append(Event(self.default_name, dt.datetime(now.year, now.month, now.day,
+                                     0, 0, 0), dt.datetime(now.year, now.month, now.day, 23, 59, 59)))
             elif not prev:
                 active_events.append(Event(self.default_name, dt.datetime(now.year, now.month, now.day, 0, 0, 0), self.get_next().get_start()))
             elif not next:
@@ -154,6 +156,7 @@ class ScheduleHandler:
     """
     Container of multiple schedules
     """
+
     def __init__(self, sched_path=None, sched_data=None):
         self.schedules = []
         self.sched_data_json = None
@@ -161,12 +164,13 @@ class ScheduleHandler:
         if not sched_data:
             try:
                 with open(sched_path, 'r') as f:
-                    self.sched_data_json = json.load(f)
+                    self.sched_data_json = pyjson5.decode_io(f, None, False)
             except Exception:
                 print(f"Schedules at '{sched_path}' not found. Exception: {traceback.format_exc()}")
 
         else:
-            self.sched_data_json = sched_data
+            # load as a json string if sched_data is a string. Otherwise, load it as json.
+            self.sched_data_json = pyjson5.decode(sched_data) if isinstance(sched_data, str) else sched_data
         for sched_name, sched_data in self.sched_data_json.items():
             sched = Schedule(name=sched_name, sched_data=sched_data)
             self.schedules.append(sched)
@@ -183,7 +187,7 @@ class ScheduleHandler:
         If a schedule has a higher priority, it will override any other schedules with a lower priority, meaning
         they won't be returned.
         """
-        now = dt.datetime.now()
+        # now = dt.datetime.now()
 
         highest_priority = -1
         valid_scheds = []
@@ -216,7 +220,7 @@ class ScheduleHandler:
         result = ""
         events = self.get_current_events()
         for i, event in enumerate(self.get_current_events()):
-            if i >= len(events)-1 and i > 0:  # if this is the last item of several, return e.g. " and event"
+            if i >= len(events) - 1 and i > 0:  # if this is the last item of several, return e.g. " and event"
                 result += f" and {event.name}"
             elif i > 0:
                 result += f", {event.name}"
@@ -225,10 +229,10 @@ class ScheduleHandler:
         return result
 
     def get_prev(self):
-        return self.get_current_sched().get_prev()
+        return self.get_current_scheds()[0].get_prev()
 
     def get_next(self):
-        return self.get_current_sched().get_next()
+        return self.get_current_scheds()[0].get_next()
 
     def get_remaining_str(self):
         """ Forcibly get the time until the next event, then return a string of it """
