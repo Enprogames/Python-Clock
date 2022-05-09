@@ -27,7 +27,8 @@ class ClockFrameTk(tk.Frame):
     def __init__(self, parent, schedule_handler=None, fact_handler=None, background='#263238', foreground='white', width=600,
                  height=400, font='Arial', font_size=100, font_multiplier=1,
                  event_text='event', show_time=True, show_date=True, show_fact=True, show_alert=True,
-                 show_remaining=True, show_summer=False, resize_dynamically=True, **kwargs):
+                 show_remaining=True, show_summer=False, resize_dynamically=True, clock_format="24",
+                 alert_interval=0, alert_color='red', **kwargs):
 
         self.bg = background
         self.fg = foreground
@@ -49,37 +50,41 @@ class ClockFrameTk(tk.Frame):
         self.show_alert = show_alert  # displays name of current event or whether it just ended
         self.show_remaining = show_remaining
         self.show_summer = show_summer
+        self.clock_format = clock_format
+        self.alert_interval = alert_interval
+        self.alert_color = alert_color
 
         self.widgets = []  # used to keep track of all widgets on the frame e.g. for changing their color
 
-        self.digital_time_label = tk.Label(self, font=(self.font, int(font_size*1.5), 'bold'),  # change font size to 200 for final program
+        self.digital_time_label = tk.Label(self, font=(self.font, int(self.font_size * 1.5), 'bold'),  # change font size to 200 for final program
                                            bg=self.bg, fg=self.fg)
         self.widgets.append(self.digital_time_label)
         if show_time:
             self.digital_time_label.place(relx=.5, rely=.5, anchor='center')
-        self.date_label = tk.Label(self, font=(self.font, int(font_size/2), 'normal'), bg=self.bg, fg=self.bg)
+        self.date_label = tk.Label(self, font=(self.font, int(self.font_size / 2), 'normal'), bg=self.bg, fg=self.bg)
         self.widgets.append(self.date_label)
         if self.show_date:
             self.date_label.place(relx=.5, rely=.65, anchor="center")
         # fact (joke) of the day label
-        self.fact_label = tk.Label(self, font=(self.font, int(font_size/4), 'normal'), bg=self.bg, fg=self.bg)
+        self.fact_label = tk.Label(self, font=(self.font, int(self.font_size / 4), 'normal'), bg=self.bg, fg=self.bg)
         self.widgets.append(self.fact_label)
         if self.show_fact:
             self.fact_label.place(relx=.5, rely=.1, anchor="n")
         self.last_fact_time = dt.datetime(1, 1, 1, 1, 1, 1)
         self.fact = ""
 
-        self.alert_label = tk.Label(self, text='Error: Schedule data not found.', font=(self.font, int(font_size/2), 'bold'), bg=self.bg, fg=self.fg)
+        self.alert_label = tk.Label(self, text='Error: Schedule data not found.',
+                                    font=(self.font, int(self.font_size / 2), 'bold'), bg=self.bg, fg=self.fg)
         self.current_alert = ""
         self.widgets.append(self.alert_label)
         if show_alert:
             self.alert_label.place(relx=.5, rely=.3, anchor='n')
 
-        self.remaining_label = tk.Label(self, text="time remaining: ", font=(self.font, int(font_size/2), 'normal'), bg=self.bg, fg=self.fg)
+        self.remaining_label = tk.Label(self, text="time remaining: ", font=(self.font, int(self.font_size / 2), 'normal'), bg=self.bg, fg=self.fg)
         if self.show_remaining:
             self.remaining_label.place(relx=.5, rely=.8, anchor='s')
         self.widgets.append(self.remaining_label)
-        self.time_till_summer_label = tk.Label(self, font=(self.font, int(font_size/4), 'normal'), bg=self.bg, fg=self.fg)
+        self.time_till_summer_label = tk.Label(self, font=(self.font, int(self.font_size / 4), 'normal'), bg=self.bg, fg=self.fg)
         if self.show_summer:
             self.time_till_summer_label.place(relx=.75, rely=.8, anchor='s')
         self.widgets.append(self.time_till_summer_label)
@@ -118,28 +123,28 @@ class ClockFrameTk(tk.Frame):
         self.font_size = font_size
 
         current_font = self.digital_time_label.cget("font").split(' ')
-        current_font[1] = font_size*1.5
+        current_font[1] = self.font_size * 1.5
         self.digital_time_label.config(font=(current_font[0], int(current_font[1]), current_font[2]))
 
         current_font = self.date_label.cget("font").split(' ')
-        current_font[1] = font_size/2
+        current_font[1] = self.font_size / 2
         self.date_label.config(font=(current_font[0], int(current_font[1]), current_font[2]))
 
         current_font = self.fact_label.cget("font").split(' ')
-        current_font[1] = font_size/4
+        current_font[1] = self.font_size / 4
         self.fact_label.config(font=(current_font[0], int(current_font[1]), current_font[2]),
-                               wraplength=self.winfo_toplevel().winfo_width()-50)
+                               wraplength=self.winfo_toplevel().winfo_width() - 50)
 
         current_font = self.alert_label.cget("font").split(' ')
-        current_font[1] = font_size/2
+        current_font[1] = self.font_size / 2
         self.alert_label.config(font=(current_font[0], int(current_font[1]), current_font[2]))
 
         current_font = self.remaining_label.cget("font").split(' ')
-        current_font[1] = font_size/2
+        current_font[1] = self.font_size / 2
         self.remaining_label.config(font=(current_font[0], int(current_font[1]), current_font[2]))
 
         current_font = self.time_till_summer_label.cget("font").split(' ')
-        current_font[1] = font_size/4
+        current_font[1] = self.font_size / 4
         self.time_till_summer_label.config(font=(current_font[0], int(current_font[1]), current_font[2]))
 
     def set_event_label(self, event_label):
@@ -148,9 +153,14 @@ class ClockFrameTk(tk.Frame):
     def update_clock(self):
         now = dt.datetime.now()
 
+        self.set_bg(self.bg)
+
         # update digital_time_label
         if self.show_clock:
-            self.digital_time_label.config(fg=self.fg, text=now.strftime('%H:%M:%S'))
+            if self.clock_format == "12":
+                self.digital_time_label.config(fg=self.fg, text=now.strftime('%I:%M:%S %p'))
+            else:
+                self.digital_time_label.config(fg=self.fg, text=now.strftime('%H:%M:%S'))
         else:
             self.digital_time_label.config(fg=self.bg)
         # update date_label
@@ -170,7 +180,7 @@ class ClockFrameTk(tk.Frame):
         # display the name of the current event
         if self.show_alert and self.schedule_handler:
             try:
-                self.alert_label.config(fg=self.fg, text=self.schedule_handler.get_current_events_str())
+                self.alert_label.config(fg=self.fg, text=self.schedule_handler.get_current_event_str())
             except AttributeError:
                 print(f"Error getting event info from schedule_handler. Exception: {traceback.print_exc()}")
                 self.alert_label.config(fg=self.fg, text="")
@@ -181,6 +191,11 @@ class ClockFrameTk(tk.Frame):
         if self.show_remaining and self.schedule_handler:
             try:
                 self.remaining_label.config(fg=self.fg, text=self.schedule_handler.get_remaining_str_verbose())
+                # make the screen red if less than one minute remains until the next event,
+                # and the setting was chosen.
+                next_event = self.schedule_handler.get_next()
+                if self.alert_interval > 0 and next_event and (next_event.start - now).seconds <= self.alert_interval:
+                    self.set_bg(self.alert_color)
             except AttributeError:
                 print(f"Error getting event info from schedule_handler. Exception: {traceback.print_exc()}")
                 self.remaining_label.config(fg=self.fg, text="")
@@ -245,7 +260,7 @@ class ClockFrameTk(tk.Frame):
 
     def resize_dynamically(self, event=None):
         self.winfo_toplevel().update_idletasks()
-        self.set_font_size((self.winfo_width()/20)*self.font_multiplier)
+        self.set_font_size((self.winfo_width() / 20) * self.font_multiplier)
 
 
 class GUIWindowTk(tk.Tk):

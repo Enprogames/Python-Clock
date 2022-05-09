@@ -6,31 +6,59 @@ import pyjson5
 
 
 class Event:
+    """A specific period of time in a schedule. Occurs at a time of day, but can occur at
+    any date. The date is handled by the schedule.
+    """
 
     def __init__(self, name, start, end):
         self.start = start
         self.end = end
         self.name = name
 
-    def __str__(self):
-        return self.name
-
     def is_current(self):
         now = dt.datetime.now()
 
         return self.start < now.time() < self.end
 
-    def get_start(self):
-        now = dt.datetime.now()
-        start_dt = dt.datetime(now.year, now.month, now.day, self.start.hour,
+    def force_start_dt(self, forced_time: dt.date):
+        start_dt = dt.datetime(forced_time.year, forced_time.month, forced_time.day, self.start.hour,
                                self.start.minute, self.start.second, self.start.microsecond)
         return start_dt
 
-    def get_end(self):
-        now = dt.datetime.now()
-        end_dt = dt.datetime(now.year, now.month, now.day, self.end.hour,
+    def force_end_dt(self, forced_time: dt.date):
+        end_dt = dt.datetime(forced_time.year, forced_time.month, forced_time.day, self.end.hour,
                              self.end.minute, self.end.second, self.end.microsecond)
         return end_dt
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.__str__(self)
+
+
+class SpecificEvent(Event):
+    """An event with a date and time instead of simply a time.
+    Normally, events are meant to occur on multiple different days, and only the time during those days
+    needs to be specified. In some cases, however, the specific event which will occur on a specific
+    date and time is needed. For example, to see how many days until the next event in a schedule occurs.
+
+    Args:
+        Event (Event): This is a child of the Event class
+    """
+
+    def __init__(self, event, date):
+        self.event = event
+        self.name = self.event.name
+        self.start = dt.datetime(date.year, date.month, date.day, self.event.start.hour,
+                                 self.event.start.minute, self.event.start.second, self.event.start.microsecond)
+        self.end = dt.datetime(date.year, date.month, date.day, self.event.end.hour,
+                               self.event.end.minute, self.event.end.second, self.event.end.microsecond)
+
+    def is_current(self):
+        now = dt.datetime.now()
+
+        return self.start < now < self.end
 
 
 class Schedule:
@@ -89,43 +117,30 @@ class Schedule:
         except Exception:
             print(f"Schedule improperly configured. Exception: {traceback.format_exc()}")
 
-    def get_current_events(self):
+    def get_current_event(self) -> Event:
         """
-        Return a list of events in this schedule which are currently going on. If no events are active, return an in-between event.
+        Return the currently active event. If they overlap, an arbitrary one will be chosen.
         """
         active_events = []
         for event in self.events:
             if event.is_current():
                 active_events.append(event)
 
-        # if no event is currently in effect (e.g. during break time), find the two closest events and create a temporary in-between event
-        if len(active_events) == 0:
-            prev = self.get_prev()
-            next = self.get_next()
-
-            now = dt.datetime.now()
-            if not (prev or next):  # no events exist, so return an event spanning the entire day
-                active_events.append(Event(self.default_name, dt.datetime(now.year, now.month, now.day,
-                                     0, 0, 0), dt.datetime(now.year, now.month, now.day, 23, 59, 59)))
-            elif not prev:
-                active_events.append(Event(self.default_name, dt.datetime(now.year, now.month, now.day, 0, 0, 0), self.get_next().get_start()))
-            elif not next:
-                active_events.append(Event(self.default_name, self.get_prev().get_end(), dt.datetime(now.year, now.month, now.day, 23, 59, 59)))
-            active_events.append(Event(self.default_name, self.get_prev().get_end(), self.get_next().get_start()))
-
-        return active_events
+        if len(active_events) > 0:
+            return active_events[0]
+        return None
 
     def get_prev(self):
         now = dt.datetime.now()
         prev = None
         for event in self.events:
-            if event.get_start() > now:
+            if event.start > now.time():
                 return prev
 
     def get_next(self):
         now = dt.datetime.now()
         for event in self.events:
-            if event.get_start() > now:
+            if event.start > now.time():
                 return event
         return None
 
@@ -151,16 +166,41 @@ class Schedule:
 
         return is_current_weekday and is_current_month and is_current_day_of_month
 
+    def is_current_at(self, time: dt.datetime) -> bool:
+        """Returns whether the schedule is active at the given time.
+        For example, it will check to see if the weekdays and days_of_month match the given time.
+
+        Args:
+            time (dt.datetime): Time which will be tested
+
+        Returns:
+            bool: Whether or not the schedule is active at the given time
+        """
+        is_current_weekday = True
+        if self.weekdays:
+            is_current_weekday = time.strftime('%A').lower() in self.weekdays
+        is_current_month = True
+        if self.months:
+            is_current_month = time.strftime('%B').lower() in self.months
+        is_current_day_of_month = True
+        if self.days_of_month:
+            is_current_day_of_month = time.strftime('%d').lower() in self.days_of_month
+
+        return is_current_weekday and is_current_month and is_current_day_of_month
+
 
 class ScheduleHandler:
     """
-    Container of multiple schedules
+    Container of multiple schedules. Schedules should occur on distinct days of the year, and shouldn't overlap.
+    If they must overlap, a higher priority level should be given to one of them.
+    If two schedules overlap and have the same priority level, an arbitrary one will be chosen.
     """
 
-    def __init__(self, sched_path=None, sched_data=None):
+    def __init__(self, sched_path=None, sched_data=None, default_event_name=""):
         self.schedules = []
         self.sched_data_json = None
-        self.sched_days = {}
+        self.default = None
+        self.default_event_name = default_event_name
         if not sched_data:
             try:
                 with open(sched_path, 'r') as f:
@@ -169,26 +209,32 @@ class ScheduleHandler:
                 print(f"Schedules at '{sched_path}' not found. Exception: {traceback.format_exc()}")
 
         else:
-            # load as a json string if sched_data is a string. Otherwise, load it as json.
+            # load sched_data as a json string if sched_data is a string. Otherwise, simply load it as json.
             self.sched_data_json = pyjson5.decode(sched_data) if isinstance(sched_data, str) else sched_data
+
+        # create Schedule objects for each schedule in the json
         for sched_name, sched_data in self.sched_data_json.items():
             sched = Schedule(name=sched_name, sched_data=sched_data)
             self.schedules.append(sched)
-            if 'days' in sched_data:
-                for day in sched_data['days']:
-                    self.sched_days[day] = sched
+            if sched_name.lower() == "default" or sched_name.lower() == "default schedule":
+                self.default = sched
 
-        self.default = self.schedules[0]
+        # select an arbitrary default is one wasn't properly specified. The default schedule should
+        # have the name "Default Schedule" or "Default"
+        if not hasattr(self, 'default'):
+            self.default = self.schedules[0]
 
-    def get_current_scheds(self):
-        """
-        Return all schedules which apply to the current time and have the highest priority.
+    def get_current_sched(self) -> Schedule:
+        """Return the schedule which applies to the current day and has a higher priority than conflicting schedules
 
         If a schedule has a higher priority, it will override any other schedules with a lower priority, meaning
-        they won't be returned.
-        """
-        # now = dt.datetime.now()
+        they won't be chosen.
 
+        Returns:
+            Schedule: The schedule which is active at the current time
+        """
+
+        # collect all valid schedules and determine what the highest priority is among current ones
         highest_priority = -1
         valid_scheds = []
         for sched in self.schedules:
@@ -202,72 +248,197 @@ class ScheduleHandler:
             if sched.priority < highest_priority:
                 valid_scheds.remove(sched)
 
-        return valid_scheds
+        if len(valid_scheds) > 0:
+            return valid_scheds[0]  # if more than one have the same priority, an arbitrary one is selected at index 0
+        else:
+            return None
 
-    def get_current_events(self) -> List[Event]:
-        events = []
+    def get_current_event(self) -> List[Event]:
+        """Get which event is currently active. If more than one event is currently active, an arbitrary
+        one will be selected.
+        Remember that events (which are specified in settings.json) should not overlap!
 
-        for sched in self.get_current_scheds():
-            for event in sched.get_current_events():
-                events.append(event)
-
-        return events
-
-    def get_current_events_str(self) -> str:
+        Returns:
+            Event: The event which is currently active.
         """
-        Return what events are currently going on in the form "event1, event2, and event3"
+        current_sched = self.get_current_sched()
+        if current_sched:
+            return current_sched.get_current_event()
+        return None
+
+    def get_current_event_str(self) -> str:
+        """Return the name of the current event. If an event isn't active, return the default event
+        name for the current schedule. If no schedule is active, return an empty string.
+
+        Returns:
+            str: Name of current event
         """
-        result = ""
-        events = self.get_current_events()
-        for i, event in enumerate(self.get_current_events()):
-            if i >= len(events) - 1 and i > 0:  # if this is the last item of several, return e.g. " and event"
-                result += f" and {event.name}"
-            elif i > 0:
-                result += f", {event.name}"
+        output = ""
+        current_event = self.get_current_event()
+        if current_event:
+            output = str(current_event)
+        else:
+            current_sched = self.get_current_sched()
+            if current_sched:
+                output = current_sched.default_name
             else:
-                result += event.name
-        return result
+                output = self.default_event_name
 
-    def get_prev(self):
-        return self.get_current_scheds()[0].get_prev()
+        return output
 
-    def get_next(self):
-        return self.get_current_scheds()[0].get_next()
+    def get_prev(self, max_test=365) -> SpecificEvent:
+        """Return what the previous event was based on the given schedules. If an event didn't occur earlier
+        on the current day, continually test using the is_current_at() function to see if there is an event
+        on a given day in the past. Text for max_test days, then give up.
+
+        Args:
+            max_test (int, optional): How many days into the past to test for. Defaults to 365.
+
+        Returns:
+            SpecificEvent: An event with a datetime instead of just a time
+        """
+        now = dt.datetime.now()
+        events: List[Event] = [event for sched in self.schedules for event in sched.events]
+        prev_event = None
+
+        # first try to find an event which is after the current one
+        for event in events:
+            # see if the current event has an end time earlier than now
+            if not prev_event and event.end < now.time():
+                prev_event = event
+            # see if the event starts after the current prev_event
+            elif prev_event and event.end > prev_event.end and event.end < now.time():
+                prev_event = event
+
+        event_date = now
+
+        # if no previous event was found (we are currently before any events in the schedule, or on the first event),
+        # then find the earliest one which starts before now.
+        if not prev_event:
+            days_behind = 1
+
+            # keep going forward and see if there is an event in the next day. If not more events exist in the coming
+            # days, this could go on forever, so only test for max_test days (1 year by default)
+            while days_behind < max_test:
+                event_date = dt.datetime(now.year, now.month, now.day - days_behind, 0, 0, 0)
+                current_scheds = [sched for sched in self.schedules if sched.is_current_at(event_date)]
+                events = [event for sched in current_scheds for event in sched.events]
+                for event in events:
+                    if not prev_event:
+                        prev_event = event
+                    elif event.end > prev_event.end:
+                        prev_event = event
+                if not prev_event:
+                    days_behind -= 1
+                else:
+                    break
+
+        return SpecificEvent(prev_event, event_date)
+
+    def get_next(self, max_test=365) -> SpecificEvent:
+        """Return what the next event will be based on the given schedules. If another event won't occur
+        on the current day, continually test using the is_current_at() function to see if there is an event
+        on a given day in the future. Text for max_test days, then give up.
+
+        Args:
+            max_test (int, optional): How many days into the future to test for. Defaults to 365.
+
+        Returns:
+            SpecificEvent: An event with a datetime instead of just a time
+        """
+        now = dt.datetime.now()
+        events: List[Event] = [event for sched in self.schedules for event in sched.events]
+        next_event = None
+
+        # first try to find an event which is after the current one
+        for event in events:
+            # see if the current event has a start time later than now
+            if not next_event and event.start > now.time():
+                next_event = event
+            # see if the event starts earlier than the current next_event
+            elif next_event and event.start < next_event.start and event.start > now.time():
+                next_event = event
+
+        event_date = now
+
+        # if no next event was found (all events take place before now on the schedule),
+        # then find the earliest one which starts before now.
+        if not next_event:
+            days_ahead = 1
+
+            # keep going forward and see if there is an event in the next day. If not more events exist in the coming
+            # days, this could go on forever, so only test for max_test days (1 year by default)
+            while days_ahead < max_test:
+                event_date = dt.datetime(now.year, now.month, now.day + days_ahead, 0, 0, 0)
+                current_scheds = [sched for sched in self.schedules if sched.is_current_at(event_date)]
+                events = [event for sched in current_scheds for event in sched.events]
+                for event in events:
+                    if not next_event:
+                        next_event = event
+                    elif event.start < next_event.start:
+                        next_event = event
+                if not next_event:
+                    days_ahead += 1
+                else:
+                    break
+
+        return SpecificEvent(next_event, event_date)
 
     def get_remaining_str(self):
         """ Forcibly get the time until the next event, then return a string of it """
         now = dt.datetime.now()
-        rem_time = self.get_current_events()[0].get_end() - now  # get start from current event from current schedule
-        hours = rem_time.seconds // 3600
+        if self.event_is_active():
+            rem_time = self.get_current_event().force_end_dt(now) - now  # get start from current event from current schedule
+        else:
+            rem_time = self.get_next().start - now
+
+        days = rem_time.seconds // (3600 * 24)
+        hours = (rem_time.seconds % 3600 * 24) // 3600
         minutes = (rem_time.seconds % 3600) // 60
         seconds = (rem_time.seconds % 60)
 
-        return f'{hours}:{minutes:02}:{seconds:02}'
+        if days > 0:
+            return f'{days}:{hours}:{minutes:02}:{seconds:02}'
+        else:
+            return f'{hours}:{minutes:02}:{seconds:02}'
 
     def get_remaining_str_verbose(self):
         """
         Return a string which will display how long until the current event ends or the next one starts
         """
         now = dt.datetime.now()
+        next_event = self.get_next()
         # Pick the first current event
-        rem_time = self.get_current_events()[0].get_end() - now  # get start from current event from current schedule
+        if self.event_is_active():
+            rem_time = self.get_current_event().force_end_dt(now) - now  # get start from current event from current schedule
+        else:
+            rem_time = next_event.start - now
+
+        days = rem_time.days
         hours = rem_time.seconds // 3600
         minutes = (rem_time.seconds % 3600) // 60
         seconds = (rem_time.seconds % 60)
 
-        current_sched = self.get_current_scheds()[0]
+        current_sched = self.get_current_sched()
+        event_is_active = False
+        if current_sched:
+            event_is_active = current_sched.event_is_active()
         remaining_text = "remaining" \
-                         if current_sched.event_is_active() \
-                         else f"until {current_sched.get_next().name}"
+                         if event_is_active \
+                         else f"until {next_event}"
 
-        return f'{hours}:{minutes:02}:{seconds:02} {remaining_text}'
+        if days > 0:
+            return f'{days} days, {hours}:{minutes:02}:{seconds:02} {remaining_text}'
+        else:
+            return f'{hours}:{minutes:02}:{seconds:02} {remaining_text}'
 
     def event_is_active(self):
         """ Return whether or not there is currently an active event going on """
         current_sched = self.get_current_sched()
         if current_sched:
             return current_sched.event_is_active()
-        return False
+        else:
+            return False
 
 
 # hide hours if it equals 0, minutes and seconds always 2 digits

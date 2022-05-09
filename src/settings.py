@@ -3,7 +3,7 @@ import pyjson5
 
 DEFAULT_SETTINGS = """
 {
-    "fact_type": "dadjoke", // options: ["dadjoke", "fact"]
+    "fact_type": "fact", // options: ["dadjoke", "fact"]
 
     "window_settings": {
         "background": "#263238",
@@ -22,10 +22,12 @@ DEFAULT_SETTINGS = """
         "resize_dynamically": true,
         "font_size": 100  // only used if dynamic resizing is false
     },
+    "default_event_name": "Break",  // what will show on the clock when no schedule is active e.g. on weekends
     "schedules": {
         "Default Schedule": {
             "default": "Break",
             "weekdays": ["monday", "tuesday", "thursday", "friday"],
+            // Events should not overlap each other
             "events": {
                 "A Block": ["8:55", "10:20"],
                 "B Block": ["10:30", "11:45"],
@@ -40,6 +42,7 @@ DEFAULT_SETTINGS = """
             // schedules with a higher priority will override other ones so that only the highest priority
             // schedules will be active. Schedules without a priority attribute will be given one of -1
             "priority": 1,
+            // Events should not overlap each other
             "events": {
                 "A Block": ["8:55", "9:40"],
                 "B Block": ["9:50", "10:35"],
@@ -57,6 +60,7 @@ DEFAULT_SETTINGS = """
             // schedules with a higher priority will override other ones so that only the highest priority
             // schedules will be active. Schedules without a priority attribute will be given one of -1
             "priority": 2,
+            // Events should not overlap each other
             "events": {
                 "A Block": ["8:55", "9:40"],
                 "B Block": ["9:50", "10:35"],
@@ -72,6 +76,7 @@ DEFAULT_SETTINGS = """
                 // schedules with a higher priority will override other ones so that only the highest priority
                 // schedules will be active. Schedules without a priority attribute will be given one of -1
                 "priority": 2,
+                // Events should not overlap each other
                 "events": {
                     "A Block": ["8:55", "9:40"],
                     "B Block": ["9:50", "10:35"],

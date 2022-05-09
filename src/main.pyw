@@ -15,10 +15,10 @@ else:
     ROOT_DIR = 'src'
 SETTINGS_PATH = os.path.join(ROOT_DIR, 'settings.json')
 
-
 setting_handler = SettingsHandler(setting_file=SETTINGS_PATH)
 
-sched_handler = ScheduleHandler(sched_data=setting_handler.schedules)
+sched_handler = ScheduleHandler(sched_data=setting_handler.schedules,
+                                default_event_name=setting_handler.default_event_name)
 
 fact_handler = FactHandler(fact_type=setting_handler.fact_type)
 
